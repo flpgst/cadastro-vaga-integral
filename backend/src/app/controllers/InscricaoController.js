@@ -44,7 +44,7 @@ class InscricaoController {
         }
       );
 
-      return res.json(inscricaoCreated);
+      return res.status(200).json({ message: 'Inscrição criada com sucesso' });
     } catch (error) {
       return res
         .status(500)
