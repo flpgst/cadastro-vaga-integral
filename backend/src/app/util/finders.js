@@ -10,6 +10,9 @@ export async function findInscricao(matricula) {
   return inscricao;
 }
 export async function findMatriculaById(id) {
-  const matricula = await Matricula.findByPk(id);
+  const matricula = await Matricula.findOne({
+    where: { id },
+    include: { all: true, nested: true },
+  });
   return matricula;
 }

@@ -1,4 +1,6 @@
+import Endereco from '../models/Endereco';
 import Inscricao from '../models/Inscricao';
+import MembroFamilia from '../models/MembroFamilia';
 import { findInscricao, findMatriculaById } from '../util/finders';
 
 class InscricaoController {
@@ -23,7 +25,25 @@ class InscricaoController {
         .json({ message: 'Já existe uma inscrição para esta matrícula' });
 
     try {
-      const inscricaoCreated = await Inscricao.create(inscricao);
+      const inscricaoCreated = await Inscricao.create(inscricao).then(
+        ({ dataValues }) => {
+          inscricao.membros.map(async (membro) => {
+            console.log('Log do endereco ', membro.endereco);
+            const endereco = membro.endereco
+              ? await Endereco.create(membro.endereco)
+              : 'bata';
+            console.log('endereco criado', endereco);
+            await MembroFamilia.create({
+              ...membro,
+              inscricao_id: dataValues.id,
+              endereco_id:
+                endereco?.id ||
+                matricula.dataValues.pessoa.dataValues.endereco.dataValues.id,
+            });
+          });
+        }
+      );
+
       return res.json(inscricaoCreated);
     } catch (error) {
       return res
