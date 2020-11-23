@@ -1,0 +1,1 @@
+# Cadastro Vaga Integral (frontend)
