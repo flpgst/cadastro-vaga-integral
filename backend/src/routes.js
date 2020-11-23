@@ -12,7 +12,7 @@ routes.post('/login', SessionController.store);
 routes.use(AuthMiddleware);
 routes.use(PermissionMiddleware);
 routes.get('/pessoa', PessoaController.index);
-routes.get('/inscricao', InscricaoController.store);
+routes.post('/inscricao', InscricaoController.store);
 routes.get('/matricula/:id', MatriculaController.index);
 
 export default routes;
