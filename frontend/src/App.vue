@@ -1,0 +1,50 @@
+<template>
+  <v-app>
+    <v-app-bar app color="primary" dark>
+      <v-row>
+        <v-col
+          v-text="user.name"
+          cols="auto"
+          class="font-weight-medium body-1 d-flex align-center text-uppercase"
+        />
+
+        <v-col cols="auto">
+          <v-divider vertical class="white" />
+        </v-col>
+
+        <v-col class="py-0 d-flex">
+          <v-col cols="auto">
+            <v-btn text depressed to="/cadastros">
+              <v-icon left v-text="'mdi-format-list-bulleted'" />
+              CONSULTA DE CADASTROS
+            </v-btn>
+          </v-col>
+        </v-col>
+      </v-row>
+
+      <v-spacer></v-spacer>
+
+      <v-btn icon>
+        <v-icon>mdi-logout-variant</v-icon>
+      </v-btn>
+    </v-app-bar>
+
+    <v-main>
+      <v-container>
+        <router-view />
+      </v-container>
+    </v-main>
+  </v-app>
+</template>
+
+<script>
+export default {
+  name: "App",
+
+  data: () => ({
+    user: {
+      name: "Neide da Silva"
+    }
+  })
+};
+</script>
