@@ -12,6 +12,8 @@ import Endereco from '../app/models/Endereco';
 import Cidade from '../app/models/Cidade';
 import Estado from '../app/models/Estado';
 import Pais from '../app/models/Pais';
+import MembroFamilia from '../app/models/MembroFamilia';
+import Parentesco from '../app/models/Parentesco';
 
 const models = [
   Atribuicao,
@@ -25,6 +27,8 @@ const models = [
   Cidade,
   Estado,
   Pais,
+  MembroFamilia,
+  Parentesco,
 ];
 
 class Database {

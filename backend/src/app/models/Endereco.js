@@ -12,6 +12,7 @@ class Endereco extends Model {
         referencia: Sequelize.STRING,
         bairro: Sequelize.STRING,
         cep: Sequelize.STRING,
+        cidade_id: Sequelize.INTEGER,
       },
       {
         modelName: 'endereco',
