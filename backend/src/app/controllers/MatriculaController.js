@@ -13,7 +13,7 @@ class MatriculaController {
     });
 
     if (!matricula) {
-      res.status(404).json({ message: 'Matrícula não existe' });
+      return res.status(404).json({ message: 'Matrícula não existe' });
     }
     if (!req.superAdmin && matricula.unidadeEnsinoId !== req.unidadeEnsinoId)
       return res
