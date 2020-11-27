@@ -5,8 +5,7 @@ class MatriculaController {
     if (!req.authorized)
       return res.status(401).json({ message: 'Não Autorizado' });
 
-    const { codigo } = req.body;
-
+    const { codigo } = req.query;
     const matricula = await Matricula.findOne({
       where: { codigo },
       include: { all: true, nested: true },
