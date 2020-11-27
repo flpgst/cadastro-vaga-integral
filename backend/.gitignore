@@ -40,4 +40,7 @@ node_modules/
 .env
 .env.test
 
+#build directory
+/dist
+
 yarn.lock
