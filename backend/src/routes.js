@@ -12,7 +12,7 @@ const routes = new Router();
 routes.post('/login', SessionController.store);
 routes.use(AuthMiddleware);
 routes.use(PermissionMiddleware);
-routes.get('/pessoa', PessoaController.index);
+routes.get('/pessoa/:id', PessoaController.index);
 routes.post('/inscricao', InscricaoController.store);
 routes.get('/matricula/:id', MatriculaController.index);
 routes.get('/parentesco', ParentescoController.index);
