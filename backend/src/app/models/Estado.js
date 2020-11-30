@@ -7,6 +7,7 @@ class Estado extends Model {
     super.init(
       {
         nome: Sequelize.STRING,
+        sigla: Sequelize.STRING,
       },
       {
         modelName: 'estado',
