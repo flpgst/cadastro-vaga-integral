@@ -34,12 +34,20 @@
         <router-view />
       </v-container>
     </v-main>
+
+    <CPTSnackbar />
   </v-app>
 </template>
 
 <script>
+import CPTSnackbar from "@/components/Snackbar";
+
 export default {
   name: "App",
+
+  components: {
+    CPTSnackbar
+  },
 
   data: () => ({
     user: {
