@@ -18,7 +18,9 @@
       <CPTSelect
         v-model="member.kinship"
         label="Grau de Parentesco*"
-        :items="['Pai', 'Mãe', 'Irmão', 'Irmã', 'Avô', 'Avó', 'Tio']"
+        :items="kinshipDegrees"
+        item-text="nome"
+        return-object
         :required="!!(member.nome || member.workplace.name)"
       />
     </v-col>
@@ -85,7 +87,11 @@
         <CPTInput v-model="member.endereco.bairro" label="Bairro*" required />
       </v-col>
       <v-col cols="6">
-        <CPTInput v-model="member.endereco.cidade" label="Cidade*" required />
+        <CPTInput
+          v-model="member.endereco.cidade.nome"
+          label="Cidade*"
+          required
+        />
       </v-col>
       <v-col cols="12">
         <CPTInput v-model="member.endereco.complemento" label="Complemento" />
@@ -126,9 +132,11 @@ export default {
   },
   mounted() {
     this.showAddressForm = !this.member.endereco.isEmpty();
+    this.getKinshipDegrees();
   },
   data: () => ({
-    showAddressForm: false
+    showAddressForm: false,
+    kinshipDegrees: []
   }),
   computed: {
     member: {
@@ -141,6 +149,11 @@ export default {
     }
   },
   methods: {
+    getKinshipDegrees() {
+      this.$http
+        .get("parentesco")
+        .then(({ data }) => (this.kinshipDegrees = data));
+    },
     validateTime
   }
 };
