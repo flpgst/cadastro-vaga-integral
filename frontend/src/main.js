@@ -3,11 +3,11 @@ import App from "./App.vue";
 import Maska from "maska";
 
 import vuetify from "./plugins/vuetify";
+import server from "./plugins/api";
 import router from "./router";
 import store from "./store";
 
-// import api from "./plugins/api";
-// Vue.prototype.$http = api;
+Vue.prototype.$http = server;
 
 Vue.config.productionTip = false;
 
@@ -25,6 +25,5 @@ new Vue({
   router,
   store,
   vuetify,
-
   render: h => h(App)
 }).$mount("#app");
