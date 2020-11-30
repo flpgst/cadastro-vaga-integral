@@ -5,6 +5,8 @@
     :counter="counter"
     :disabled="disabled"
     :rules="rules"
+    @click:append="onClickAppend"
+    @keydown="event => $emit('keydown', event)"
     clearable
     flat
     outlined
@@ -29,6 +31,10 @@ export default {
       type: Boolean,
       default: false
     },
+    uppercase: {
+      type: Boolean,
+      default: true
+    },
     validator: {
       type: Array,
       default: () => []
@@ -41,10 +47,17 @@ export default {
   computed: {
     model: {
       get() {
-        return this.value;
+        return typeof this.value === "string" && this.uppercase
+          ? this.value.toUpperCase()
+          : this.value;
       },
       set(newValue) {
-        this.$emit("input", newValue);
+        this.$emit(
+          "input",
+          typeof newValue === "string" && this.uppercase
+            ? newValue.toUpperCase()
+            : newValue
+        );
       }
     },
     rules() {
@@ -53,6 +66,11 @@ export default {
       if (this.required) rules.push(v => !!v || "Este campo é obrigatório");
 
       return rules;
+    }
+  },
+  methods: {
+    onClickAppend() {
+      this.$emit("click:append");
     }
   }
 };

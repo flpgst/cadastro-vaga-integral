@@ -11,7 +11,7 @@
 
 <script>
 export default {
-  name: "CVIInput",
+  name: "CVISelect",
   props: {
     required: {
       type: Boolean,
@@ -22,7 +22,7 @@ export default {
       default: () => []
     },
     value: {
-      type: [Number, String],
+      type: [Number, String, Object],
       default: null
     }
   },
