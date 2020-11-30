@@ -5,7 +5,8 @@ yarn.lock
 
 
 # local env files
-/src/config/config-*.js
+src/config/config-dev.js
+src/config/config-prod.js
 
 # Log files
 npm-debug.log*
