@@ -4,7 +4,7 @@ export default class FamilyMember {
   constructor() {
     this.nome = null;
     this.kinship = null;
-    this.income = 500;
+    this.income = null;
 
     this.workplace = {
       name: null,
