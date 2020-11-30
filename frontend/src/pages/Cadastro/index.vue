@@ -5,19 +5,22 @@
       <v-col cols="12">
         <CPTInput
           v-model="enrollment"
-          v-maska="'##########'"
+          v-maska="'###########'"
+          autofocus
           label="Matrícula*"
-          counter="10"
+          counter="11"
+          @input="student = null"
+          @keydown.enter="isValidEnrollment && getStudent(enrollment)"
           required
           type="number"
-          @input="onInputEnrollment($event)"
         />
       </v-col>
       <v-col cols="12 d-flex justify-end">
         <CPTBtn
           label="Buscar"
           icon="mdi-magnify"
-          :disabled="disableSearchButton"
+          :disabled="!isValidEnrollment"
+          @click="getStudent(enrollment)"
         />
       </v-col>
       <v-form
@@ -31,29 +34,21 @@
         <v-col cols="12">
           <CPTSubtitle label="Dados do aluno" />
         </v-col>
-        <v-col cols="6">
-          <CPTInput v-model="student.nome" label="Nome*" disabled required />
-        </v-col>
 
-        <v-col cols="6">
-          <CPTInput
-            v-model="student.dataNascimento"
-            label="Data de Nascimento*"
-            disabled
-            required
-          />
+        <v-col cols="12">
+          <CPTInput v-model="student.nome" label="Nome*" disabled required />
         </v-col>
 
         <v-col :cols="isProcessoJudicial ? 4 : 6">
           <v-switch
-            v-model="student.isVulneravel"
+            v-model="vulnerabilidadeSocial"
             label="Criança em vulnerabilidade social"
           />
         </v-col>
         <v-col :cols="isProcessoJudicial ? 3 : 6">
           <v-switch
             v-model="isProcessoJudicial"
-            @click="student.processoJudicial = null"
+            @click="processoJudicial = null"
             label="Cadastro por processo judicial"
           />
         </v-col>
@@ -95,7 +90,7 @@
           </v-col>
           <v-col cols="6">
             <CPTInput
-              v-model="student.endereco.cidade"
+              v-model="student.endereco.cidade.nome"
               label="Cidade*"
               required
             />
@@ -123,13 +118,13 @@
           />
 
           <template v-for="(member, index) in members">
-            <v-col cols="12" :key="`${member.name}_${Math.random() * 10000}`">
+            <v-col cols="12" :key="`${member.name}_${member.kinship}_divider`">
               <CPTSubtitle />
             </v-col>
 
             <CPTFormMemberFamily
               v-model="members[index]"
-              :key="`${member.name}_${Math.random() * 10000}`"
+              :key="`${member.name}_${member.kinship}`"
             />
           </template>
 
@@ -165,44 +160,75 @@
                   { sortable: false, value: 'number' },
                   {
                     text: 'Parentesco',
-                    sortable: false,
-                    value: 'kinship'
+                    sortable: false
                   },
                   {
                     text: 'Nome',
-                    sortable: false,
-                    value: 'nome'
+                    sortable: false
                   },
                   {
-                    text: 'Renda Mensal (R$)',
-                    sortable: false,
-                    value: 'income'
+                    text: 'Renda Mensal',
+                    sortable: false
                   }
                 ]"
-                :items="
-                  family.map((member, index) => ({
-                    ...member,
-                    number: index + 1
-                  }))
-                "
+                :items="family"
               >
-                <template v-slot:item="{ item: member }">
+                <template v-slot:item="{ item: member, index }">
+                  <tr v-if="index === 0">
+                    <td>
+                      <span class="text-subtitle-1" v-text="index + 1" />
+                    </td>
+
+                    <td />
+
+                    <td>
+                      <span class="text-subtitle-1" v-text="student.nome" />
+                    </td>
+
+                    <td>
+                      R$ 0,00
+                    </td>
+                  </tr>
+
                   <tr>
                     <td>
-                      <span class="text-subtitle-1" v-text="member.number" />
+                      <span class="text-subtitle-1" v-text="index + 2" />
                     </td>
                     <td>
-                      <span class="text-subtitle-1" v-text="member.kinship" />
+                      <span
+                        class="text-subtitle-1"
+                        v-text="member.kinship.nome"
+                      />
                     </td>
                     <td>
                       <span class="text-subtitle-1" v-text="member.nome" />
                     </td>
                     <td>
                       <v-text-field
-                        class="text-subtitle-1"
                         v-model="member.income"
+                        prefix="R$"
+                        @input="
+                          income => {
+                            if (income)
+                              member.income = income.replace('.', ',');
+                          }
+                        "
+                        class="text-subtitle-1"
+                        v-maska="'#*,##'"
                       />
                     </td>
+                  </tr>
+                  <tr v-if="index === family.length - 1">
+                    <td />
+                    <td />
+
+                    <td class="caption font-weight-medium">
+                      Renda per capta:
+                    </td>
+                    <td
+                      v-text="`R$ ${rendaPerCapta}`"
+                      class="text-subtitle-1"
+                    />
                   </tr>
                 </template>
               </v-data-table>
@@ -215,8 +241,6 @@
         </v-col>
       </v-form>
     </v-col>
-
-    <CPTSnackbar />
   </v-row>
 </template>
 
@@ -226,9 +250,8 @@ import CPTSelect from "@/components/Select";
 import CPTSubtitle from "@/components/FormSubtitle";
 import CPTBtn from "@/components/Btn";
 import CPTFormMemberFamily from "@/pages/Cadastro/components/FormMemberFamily";
-import CPTSnackbar from "@/components/Snackbar";
 
-import FamilyMember from "@/models/FamilyMember.js";
+import FamilyMember from "@/models/FamilyMember";
 import Student from "@/models/Student";
 
 import validateTime from "@/utils/validateTime";
@@ -246,17 +269,18 @@ export default {
     CPTSelect,
     CPTBtn,
     CPTSubtitle,
-    CPTFormMemberFamily,
-    CPTSnackbar
+    CPTFormMemberFamily
   },
   data: () => ({
     MEIOS_TRANSPORTE,
     enrollment: null,
+
     isProcessoJudicial: false,
     processoJudicial: null,
+    vulnerabilidadeSocial: false,
     meioTransporteProprio: null,
+
     student: null,
-    incomeSlot: "income",
     father: new FamilyMember(),
     mother: new FamilyMember(),
     newFamilyMember: null,
@@ -264,8 +288,8 @@ export default {
   }),
 
   computed: {
-    disableSearchButton() {
-      return this.enrollment?.toString()?.length !== 10;
+    isValidEnrollment() {
+      return this.enrollment?.toString()?.length === 11;
     },
     family() {
       let family = [...this.members];
@@ -277,14 +301,23 @@ export default {
         !this.newFamilyMember.isEmpty() &&
         family.push(this.newFamilyMember);
 
-      return family
-        .map(member => (member.nome && member.kinship ? member : null))
-        .filter(member => !!member);
-    }
-  },
+      return family.filter(member => member.nome && member.kinship);
+    },
+    rendaPerCapta() {
+      const rendaPerCapta =
+        this.family.reduce(
+          (renda, member) => (renda += this.stringToCash(member.income)),
+          0
+        ) /
+        (this.family.length + 1);
 
-  mounted() {
-    this.getStudent();
+      return (
+        rendaPerCapta
+          ?.toFixed("2")
+          ?.toString()
+          ?.replace(".", ",") || "0"
+      );
+    }
   },
 
   methods: {
@@ -295,30 +328,41 @@ export default {
 
       this.$refs.form.resetValidation();
     },
-    getStudent(/*enrollment*/) {
-      setTimeout(() => {
-        this.student = new Student();
-      }, 1);
-    },
-    onInputEnrollment(enrollment) {
-      this.student = null;
-
-      if (enrollment?.toString()?.length !== 10) return;
-
-      this.getStudent(enrollment);
+    getStudent(codigo) {
+      this.$http
+        .get("matricula", { params: { codigo } })
+        .then(({ data: student }) => {
+          this.student = new Student(student);
+        })
+        .catch(error => {
+          console.log(JSON.stringify(error));
+          this.showMessage(error, "error");
+        });
     },
     onSubmit() {
       if (!this.$refs.form.validate())
-        return this.showMessage("Verifique as informações", "error");
+        return this.showMessage(
+          "Verifique as informações inseridas e tente novamente",
+          "error"
+        );
 
-      // if (!this.members.length)
-      //   return this.showMessage("Verifique as informações", "error");
+      if (!this.family.length)
+        return this.showMessage(
+          "O grupo familiar deve possuir ao menos um membro além do aluno",
+          "error"
+        );
 
-      console.log("deu bom");
+      const family = this.family.map(member => ({
+        ...member,
+        income: Number(member.income?.replace(",", "."))
+      }));
 
-      // this.newFamilyMember instanceof FamilyMember &&
-      //   this.newFamilyMember.isEmpty() &&
-      //   this.members.push(this.newFamilyMember);
+      console.log(family);
+    },
+    stringToCash(string) {
+      if (typeof string === "number") return string;
+
+      return string ? Number(string.replace(",", ".")) : 0;
     },
     validateTime
   }
