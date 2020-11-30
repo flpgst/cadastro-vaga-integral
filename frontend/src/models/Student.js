@@ -1,14 +1,15 @@
 export default class Student {
-  constructor() {
-    this.nome = "Adeilson da Silva";
-    this.dataNascimento = "07/07/2001";
-    this.isVulneravel = false;
+  constructor({ id, pessoa, codigo }) {
+    this.id = pessoa.id;
+    this.codigo = codigo;
+    this.nome = pessoa.nome;
+    this.matricula = {
+      id,
+      codigo
+    };
     this.endereco = {
-      rua: "Avenida Itaipava",
-      numero: 4076,
-      bairro: "Itaipava",
-      cidade: "Itajaí",
-      complemento: "Em frente ao Atacarejo Itaipava"
+      ...pessoa.endereco,
+      rua: pessoa.endereco.logradouro
     };
   }
 }
