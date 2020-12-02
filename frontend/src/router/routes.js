@@ -1,24 +1,18 @@
-import Home from "@/pages/Home";
+import NovoCadastro from "@/pages/Cadastro/Novo";
+
 const ListaCadastros = () =>
   import(/* webpackChunkName: "lista-cadastros" */ "@/pages/Cadastro/Lista");
-const NovoCadastro = () =>
-  import(/* webpackChunkName: "novo-cadastro" */ "@/pages/Cadastro/Novo");
 
 const routes = [
   {
     path: "/",
-    name: "Home",
-    component: Home
+    name: "Novo Cadastro",
+    component: NovoCadastro
   },
   {
     path: "/cadastros",
     name: "Cadastros",
     component: ListaCadastros
-  },
-  {
-    path: "/cadastros/novo",
-    name: "Novo Cadastro",
-    component: NovoCadastro
   }
 ];
 
