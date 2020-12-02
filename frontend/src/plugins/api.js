@@ -1,9 +1,6 @@
 import axios from "axios";
 
-import prod from "@/config/config-prod.js";
-import dev from "@/config/config-dev.js";
-
-const config = process.env.NODE_ENV === "production" ? prod : dev;
+import config from "@/config";
 
 const server = axios.create({
   baseURL: config.baseURL,
