@@ -6,7 +6,7 @@
         <v-app-bar app color="primary" dark>
           <v-row>
             <v-col
-              v-text="user.name"
+              v-text="user.nome"
               cols="auto"
               class="font-weight-medium body-1 d-flex align-center text-uppercase"
             />
@@ -17,8 +17,13 @@
 
             <v-col class="py-0 d-flex">
               <v-col cols="auto">
+                <v-btn text exact depressed to="/">
+                  NOVO CADASTRO
+                </v-btn>
+              </v-col>
+
+              <v-col cols="auto">
                 <v-btn text depressed to="/cadastros">
-                  <v-icon left v-text="'mdi-format-list-bulleted'" />
                   CONSULTA DE CADASTROS
                 </v-btn>
               </v-col>
@@ -47,7 +52,7 @@
 <script>
 import CPTSnackbar from "@/components/Snackbar";
 import Login from "@/pages/Login";
-import { isAuthenticated, logout } from "@/plugins/security";
+import { isAuthenticated, logout, getUser } from "@/plugins/security";
 
 export default {
   name: "App",
@@ -58,9 +63,7 @@ export default {
   },
 
   data: () => ({
-    user: {
-      name: "Neide da Silva"
-    }
+    user: getUser()
   }),
   methods: {
     isAuthenticated,
