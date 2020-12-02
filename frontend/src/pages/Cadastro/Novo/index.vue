@@ -332,8 +332,6 @@ export default {
   },
 
   mounted() {
-    // this.getStudent("20191100095");
-    // setTimeout(() => (this.loading = false), 5000);
     this.getStates();
   },
 
