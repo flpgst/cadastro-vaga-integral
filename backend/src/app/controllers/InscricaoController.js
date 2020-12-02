@@ -49,5 +49,19 @@ class InscricaoController {
         .json({ message: 'Ocorreu um erro. Tente Novamente' });
     }
   }
+
+  async index(req, res) {
+    if (!req.authorized)
+      return res.status(401).json({ message: 'Não Autorizado' });
+
+    const inscricoes = await Inscricao.findAll({
+      include: {
+        all: true,
+        nested: true,
+      },
+    });
+
+    return res.json(inscricoes);
+  }
 }
 export default new InscricaoController();
