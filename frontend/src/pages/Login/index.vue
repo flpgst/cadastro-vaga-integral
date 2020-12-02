@@ -65,7 +65,13 @@ export default {
         login: this.username,
         senha: this.password
       });
+
       localStorage.setItem("token", data.token);
+
+      const { id, nome_exibicao: nome } = data;
+
+      localStorage.setItem("user", JSON.stringify({ id, nome }));
+
       window.location.reload();
     }
   }
