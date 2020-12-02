@@ -7,22 +7,11 @@ export default class Address {
     this.complemento = null;
   }
 
-  isAttrEmpty(attr) {
-    for (const key in attr) {
-      if (!attr[key]) continue;
+  isEmpty(obj = this) {
+    for (const attr in obj) {
+      if (!obj[attr]) continue;
 
-      if (!(typeof attr[key] === "object") || !this.isAttrEmpty(attr[key]))
-        return false;
-    }
-
-    return true;
-  }
-
-  isEmpty() {
-    for (const attr in this) {
-      if (!this[attr]) continue;
-
-      if (!(typeof this[attr] === "object") && !this.isAttrEmpty(this[attr]))
+      if (!(typeof obj[attr] === "object") || !obj.isEmpty(obj[attr]))
         return false;
     }
 
@@ -30,6 +19,6 @@ export default class Address {
   }
 
   clear() {
-    for (const attr in this) this[attr] = attr === "cidade" ? {} : null;
+    this.constructor();
   }
 }
