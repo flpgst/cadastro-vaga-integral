@@ -11,7 +11,6 @@
           counter="11"
           @input="student = null"
           @keydown.enter="isValidEnrollment && getStudent(enrollment)"
-          required
           type="number"
         />
       </v-col>
@@ -20,11 +19,20 @@
           label="Buscar"
           icon="mdi-magnify"
           :disabled="!isValidEnrollment"
+          :loading="loading"
           @click="getStudent(enrollment)"
         />
       </v-col>
+
+      <v-skeleton-loader
+        v-if="loading"
+        :types="{ sections: 'heading, list-item-two-line@4' }"
+        type="sections@2"
+        class="mt-5"
+      />
+
       <v-form
-        v-if="student"
+        v-else-if="student"
         @submit.prevent="onSubmit"
         ref="form"
         lazy-validation
@@ -63,7 +71,7 @@
 
         <v-col cols="12">
           <CPTSelect
-            v-model="meioTransporteProprio"
+            v-model="transporteProprio"
             :items="MEIOS_TRANSPORTE"
             item-text="text"
             item-value="value"
@@ -78,10 +86,10 @@
           <v-col cols="6">
             <CPTInput v-model="student.endereco.rua" label="Rua*" required />
           </v-col>
-          <v-col cols="6">
+          <v-col cols="2">
             <CPTInput v-model="student.endereco.numero" label="Número" />
           </v-col>
-          <v-col cols="6">
+          <v-col cols="4">
             <CPTInput
               v-model="student.endereco.bairro"
               label="Bairro*"
@@ -89,9 +97,27 @@
             />
           </v-col>
           <v-col cols="6">
-            <CPTInput
-              v-model="student.endereco.cidade.nome"
+            <CPTAutocomplete
+              v-model="state"
+              label="Estado*"
+              @change="getCities(true)"
+              :items="states"
+              noDataText="Estado não encontrado"
+              item-text="nome"
+              clearable
+              return-object
+              required
+            />
+          </v-col>
+          <v-col cols="6">
+            <CPTAutocomplete
+              v-model="student.endereco.cidade"
               label="Cidade*"
+              :items="cities"
+              item-text="nome"
+              noDataText="Cidade não encontrada"
+              return-object
+              clearable
               required
             />
           </v-col>
@@ -112,19 +138,22 @@
           <CPTSubtitle />
 
           <CPTFormMemberFamily
+            v-if="mother"
             v-model="mother"
             removeButton
-            :disableRemoveButton="mother.isEmpty()"
+            @remove="mother = null"
           />
 
           <template v-for="(member, index) in members">
-            <v-col cols="12" :key="`${member.name}_${member.kinship}_divider`">
+            <v-col cols="12" :key="`${member.nome}_${member.kinship}_divider`">
               <CPTSubtitle />
             </v-col>
 
             <CPTFormMemberFamily
               v-model="members[index]"
-              :key="`${member.name}_${member.kinship}`"
+              removeButton
+              @remove="members.splice(index, 1)"
+              :key="`${member.nome}_${member.kinship}`"
             />
           </template>
 
@@ -132,16 +161,20 @@
             <v-col cols="12">
               <CPTSubtitle />
             </v-col>
-            <CPTFormMemberFamily v-model="newFamilyMember" />
+            <CPTFormMemberFamily
+              v-model="newFamilyMember"
+              removeButton
+              @remove="newFamilyMember = null"
+            />
           </template>
 
-          <v-col class="d-flex justify-center">
+          <v-col class="d-flex justify-center" cols="12">
             <CPTBtn
               label="Adicionar Membro"
               icon="mdi-plus"
               :disabled="
                 father.isEmpty() ||
-                  mother.isEmpty() ||
+                  (mother && mother.isEmpty()) ||
                   (newFamilyMember && newFamilyMember.isEmpty())
               "
               @click="addFamilyMember"
@@ -218,18 +251,6 @@
                       />
                     </td>
                   </tr>
-                  <tr v-if="index === family.length - 1">
-                    <td />
-                    <td />
-
-                    <td class="caption font-weight-medium">
-                      Renda per capta:
-                    </td>
-                    <td
-                      v-text="`R$ ${rendaPerCapta}`"
-                      class="text-subtitle-1"
-                    />
-                  </tr>
                 </template>
               </v-data-table>
             </v-col>
@@ -237,22 +258,59 @@
         </v-col>
 
         <v-col cols="12 d-flex justify-end">
-          <CPTBtn label="Salvar" icon="mdi-content-save" type="submit" />
+          <CPTBtn
+            label="Salvar"
+            :loading="saving"
+            icon="mdi-content-save"
+            type="submit"
+          />
         </v-col>
       </v-form>
     </v-col>
+
+    <v-dialog v-model="dialog" width="750">
+      <v-card color="grey lighten-5">
+        <v-card-title
+          class="headline primary white--text"
+          v-text="'Renda percapta zerada'"
+        />
+
+        <v-card-text class="pt-3">
+          Não foi atribuída renda para nenhum membro do grupo familiar. Deseja
+          continuar?
+        </v-card-text>
+
+        <v-divider />
+
+        <v-card-actions class="d-flex justify-end py-3">
+          <CPTBtn
+            label="Não"
+            @click="dialog = false"
+            color="red"
+            icon="mdi-close"
+          />
+          <CPTBtn
+            label="Sim"
+            @click="criarInscricao(inscricao), (dialog = false)"
+            icon="mdi-check"
+          />
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-row>
 </template>
 
 <script>
 import CPTInput from "@/components/Input";
 import CPTSelect from "@/components/Select";
+import CPTAutocomplete from "@/components/Autocomplete";
 import CPTSubtitle from "@/components/FormSubtitle";
 import CPTBtn from "@/components/Btn";
 import CPTFormMemberFamily from "@/pages/Cadastro/components/FormMemberFamily";
 
 import FamilyMember from "@/models/FamilyMember";
 import Student from "@/models/Student";
+import Inscricao from "@/models/Inscricao";
 
 import validateTime from "@/utils/validateTime";
 
@@ -267,20 +325,34 @@ export default {
   components: {
     CPTInput,
     CPTSelect,
+    CPTAutocomplete,
     CPTBtn,
     CPTSubtitle,
     CPTFormMemberFamily
   },
+
+  mounted() {
+    // this.getStudent("20191100095");
+    // setTimeout(() => (this.loading = false), 5000);
+    this.getStates();
+  },
+
   data: () => ({
     MEIOS_TRANSPORTE,
     enrollment: null,
+    loading: false,
+    saving: false,
+    dialog: false,
 
     isProcessoJudicial: false,
     processoJudicial: null,
     vulnerabilidadeSocial: false,
-    meioTransporteProprio: null,
+    transporteProprio: null,
+    inscricao: null,
 
     student: null,
+    state: null,
+    cities: [],
     father: new FamilyMember(),
     mother: new FamilyMember(),
     newFamilyMember: null,
@@ -288,35 +360,29 @@ export default {
   }),
 
   computed: {
+    states() {
+      return this.$store.state.address.states;
+    },
+
     isValidEnrollment() {
       return this.enrollment?.toString()?.length === 11;
     },
     family() {
-      let family = [...this.members];
+      let family = [];
 
       !this.father.isEmpty() && family.push(this.father);
-      !this.mother.isEmpty() && family.push(this.mother);
+
+      this.mother instanceof FamilyMember &&
+        !this.mother.isEmpty() &&
+        family.push(this.mother);
+
+      family.push(...this.members);
 
       this.newFamilyMember instanceof FamilyMember &&
         !this.newFamilyMember.isEmpty() &&
         family.push(this.newFamilyMember);
 
       return family.filter(member => member.nome && member.kinship);
-    },
-    rendaPerCapta() {
-      const rendaPerCapta =
-        this.family.reduce(
-          (renda, member) => (renda += this.stringToCash(member.income)),
-          0
-        ) /
-        (this.family.length + 1);
-
-      return (
-        rendaPerCapta
-          ?.toFixed("2")
-          ?.toString()
-          ?.replace(".", ",") || "0"
-      );
     }
   },
 
@@ -328,16 +394,64 @@ export default {
 
       this.$refs.form.resetValidation();
     },
+    criarInscricao(inscricao) {
+      this.saving = true;
+
+      this.$http
+        .post("inscricao", inscricao)
+        .then(() => {
+          this.showMessage("Inscrição criada com sucesso", "success");
+          this.$refs.form.reset();
+          this.student = this.inscricao = this.enrollment = null;
+          this.saving = false;
+        })
+        .catch(error => {
+          this.$refs.form.reset();
+          this.student = this.inscricao = this.enrollment = null;
+
+          this.showMessage(error, "error");
+          this.saving = false;
+        });
+    },
+    async getCities(clearStudentCity) {
+      if (clearStudentCity) {
+        this.student.endereco.cidade = null;
+        this.$refs.form.resetValidation();
+      }
+
+      if (!this.state) return;
+
+      const { data: cities } = await this.$http.get(
+        `cidade?estado_id=${this.state.id}`
+      );
+
+      this.cities = cities;
+    },
+    getStates() {
+      if (!this.states) this.$store.dispatch("address/getStates");
+    },
     getStudent(codigo) {
+      this.loading = true;
       this.$http
         .get("matricula", { params: { codigo } })
         .then(({ data: student }) => {
           this.student = new Student(student);
+
+          this.getStates();
+          this.state = this.student.endereco.cidade.estado;
+
+          this.getCities();
+          this.loading = false;
         })
         .catch(error => {
-          console.log(JSON.stringify(error));
+          this.loading = false;
           this.showMessage(error, "error");
         });
+    },
+    handleRendaPerCaptaZerada(inscricao) {
+      this.inscricao = inscricao;
+
+      this.dialog = true;
     },
     onSubmit() {
       if (!this.$refs.form.validate())
@@ -354,10 +468,32 @@ export default {
 
       const family = this.family.map(member => ({
         ...member,
-        income: Number(member.income?.replace(",", "."))
+        income: Number(member.income?.replace(",", ".")),
+        endereco: member.endereco.isEmpty() ? null : member.endereco
       }));
 
-      console.log(family);
+      const inscricao = new Inscricao(
+        this.student.matricula.id,
+        family,
+        this.transporteProprio,
+        this.vulnerabilidadeSocial,
+        this.processoJudicial
+      );
+
+      if (!this.rendaPerCapta())
+        return this.handleRendaPerCaptaZerada(inscricao);
+
+      this.criarInscricao(inscricao);
+    },
+    rendaPerCapta() {
+      const rendaPerCapta =
+        this.family.reduce(
+          (renda, member) => (renda += this.stringToCash(member.income)),
+          0
+        ) /
+        (this.family.length + 1);
+
+      return rendaPerCapta;
     },
     stringToCash(string) {
       if (typeof string === "number") return string;
