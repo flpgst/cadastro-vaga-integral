@@ -6,7 +6,7 @@ class Grupo extends Model {
   static init(sequelize) {
     super.init(
       {
-        nome_exibicao: Sequelize.STRING,
+        nome: Sequelize.STRING,
         ativo: Sequelize.BOOLEAN,
       },
       {
@@ -16,10 +16,20 @@ class Grupo extends Model {
       }
     );
   }
-  static associate(models) {
-    this.belongsToMany(models.usuario, {
-      through: 'atribuicao',
-    });
-  }
+  // static associate(models) {
+  //   this.hasOne(models.atribuicao, {
+  //     foreignKey: {
+  //       name: 'grupoId',
+  //       type: Sequelize.INTEGER,
+  //       field: 'grupo_id',
+  //     },
+  //   });
+  // }
+  // static associate(models) {
+  //   this.belongsToMany(models.usuario, {
+  //     through: 'atribuicao',
+  //     hooks: true,
+  //   });
+  // }
 }
 export default Grupo;

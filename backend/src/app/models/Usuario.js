@@ -24,8 +24,12 @@ class Usuario extends Model {
     return Crypto.MD5(password).toString() === this.senha;
   }
   static associate(models) {
-    this.belongsToMany(models.grupo, {
-      through: 'atribuicao',
+    this.hasMany(models.atribuicao, {
+      foreignKey: {
+        name: 'usuarioId',
+        type: Sequelize.INTEGER,
+        field: 'usuario_id',
+      },
     });
   }
 }
