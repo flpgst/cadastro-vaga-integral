@@ -52,12 +52,21 @@ export default {
   methods: {
     onSubmit() {
       if (!this.$refs.form.validate())
-        return this.showMessage("Usuário ou senha inválidos", "error");
+        return this.showMessage(
+          "Você precisa informar o nome de usuário e senha",
+          "error"
+        );
 
       this.login();
     },
-    login() {
-      // const { username, password } = this;
+
+    async login() {
+      const { data } = await this.$http.post("login", {
+        login: this.username,
+        senha: this.password
+      });
+      localStorage.setItem("token", data.token);
+      window.location.reload();
     }
   }
 };
