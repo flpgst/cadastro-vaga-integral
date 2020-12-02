@@ -3,7 +3,7 @@ import Address from "@/models/Address";
 export default class FamilyMember {
   constructor() {
     this.nome = null;
-    this.kinship = null;
+    this.kinship = {};
     this.income = null;
 
     this.workplace = {
@@ -16,22 +16,11 @@ export default class FamilyMember {
     this.endereco = new Address();
   }
 
-  isAttrEmpty(attr) {
-    for (const key in attr) {
-      if (!attr[key]) continue;
+  isEmpty(obj = this) {
+    for (const attr in obj) {
+      if (!obj[attr]) continue;
 
-      if (!(typeof attr[key] === "object") || !this.isAttrEmpty(attr[key]))
-        return false;
-    }
-
-    return true;
-  }
-
-  isEmpty() {
-    for (const attr in this) {
-      if (!this[attr]) continue;
-
-      if (!(typeof this[attr] === "object") && !this.isAttrEmpty(this[attr]))
+      if (!(typeof obj[attr] === "object") || !obj.isEmpty(obj[attr]))
         return false;
     }
 

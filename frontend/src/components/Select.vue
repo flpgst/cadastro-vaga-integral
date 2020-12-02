@@ -5,7 +5,7 @@
     flat
     outlined
     rounded
-    :rules="validate"
+    :rules="rules"
   />
 </template>
 
@@ -17,7 +17,7 @@ export default {
       type: Boolean,
       default: false
     },
-    rules: {
+    validator: {
       type: Array,
       default: () => []
     },
@@ -35,10 +35,10 @@ export default {
         this.$emit("input", newValue);
       }
     },
-    validate() {
+    rules() {
       const rules = this.required
-        ? [...this.rules, v => !!v || "Este campo é obrigatório"]
-        : [...this.rules];
+        ? [...this.validator, v => !!v || "Este campo é obrigatório"]
+        : [...this.validator];
 
       return rules;
     }
