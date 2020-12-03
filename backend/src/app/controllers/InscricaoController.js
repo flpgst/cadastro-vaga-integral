@@ -2,6 +2,7 @@ import Endereco from '../models/Endereco';
 import Inscricao from '../models/Inscricao';
 import MembroFamilia from '../models/MembroFamilia';
 import { findInscricao, findMatriculaById } from '../util/finders';
+import { cpf } from 'cpf-cnpj-validator';
 
 class InscricaoController {
   async store(req, res) {
@@ -24,14 +25,28 @@ class InscricaoController {
         .status(400)
         .json({ message: 'Já existe uma inscrição para esta matrícula' });
 
+    const invalidCPF = inscricao.membros.find(
+      (membro) => membro.cpf && !cpf.isValid(membro.cpf)
+    );
+
+    const invalidCertidaoNascimento = inscricao.membros.find(
+      (membro) =>
+        membro.certidao_nascimento &&
+        String(membro.certidao_nascimento).length !== 32
+    );
+
+    if (invalidCPF) return res.status(400).json({ message: 'CPF Inválido' });
+    if (invalidCertidaoNascimento)
+      return res
+        .status(400)
+        .json({ message: 'Certidão de Nascimento inválida' });
+
     try {
       await Inscricao.create(inscricao).then(({ dataValues }) => {
         inscricao.membros.map(async (membro) => {
-          console.log('Log do endereco ', membro.endereco);
-          const endereco = membro.endereco
-            ? await Endereco.create(membro.endereco)
-            : 'bata';
-          console.log('endereco criado', endereco);
+          const endereco =
+            membro.endereco && (await Endereco.create(membro.endereco));
+
           await MembroFamilia.create({
             ...membro,
             inscricao_id: dataValues.id,
@@ -41,12 +56,9 @@ class InscricaoController {
           });
         });
       });
-
       return res.status(200).json({ message: 'Inscrição criada com sucesso' });
     } catch (error) {
-      return res
-        .status(500)
-        .json({ message: 'Ocorreu um erro. Tente Novamente' });
+      return res.status(error.status).json({ message: error });
     }
   }
 
