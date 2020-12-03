@@ -17,6 +17,7 @@ routes.use(PermissionMiddleware);
 routes.get('/pessoa/:id', PessoaController.index);
 routes.post('/inscricao', InscricaoController.store);
 routes.get('/inscricao', InscricaoController.index);
+routes.put('/inscricao/:id', InscricaoController.update);
 routes.get('/matricula/', MatriculaController.index);
 routes.get('/parentesco', ParentescoController.index);
 routes.get('/cidade', CidadeController.index);

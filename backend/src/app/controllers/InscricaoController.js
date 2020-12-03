@@ -63,5 +63,23 @@ class InscricaoController {
 
     return res.json(inscricoes);
   }
+
+  async update(req, res) {
+    if (!req.gestor && !req.superAdmin)
+      return res.status(401).json({ message: 'Não Autorizado' });
+
+    const { deferido, posicao } = req.body;
+    const { id } = req.params;
+
+    try {
+      const inscricao = await Inscricao.findByPk(id);
+      inscricao.deferido = deferido ?? inscricao.deferido;
+      inscricao.posicao = posicao ?? inscricao.posicao;
+      await inscricao.save();
+      return res.json(inscricao);
+    } catch (error) {
+      return res.status(error.status).json({ message: error });
+    }
+  }
 }
 export default new InscricaoController();

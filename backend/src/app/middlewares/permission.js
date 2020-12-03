@@ -19,6 +19,9 @@ export default async (req, res, next) => {
   req.superAdmin =
     user.atribuicoes[0].dataValues.grupo.dataValues.nome ===
     'Super Administrador';
+  req.gestor =
+    user.atribuicoes[0].dataValues.grupo.dataValues.nome === 'Gestor';
+
   if (
     user.atribuicoes[0].dataValues.grupo.dataValues.nome ===
       'Super Administrador' ||
