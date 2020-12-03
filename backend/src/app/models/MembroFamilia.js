@@ -12,6 +12,9 @@ class MembroFamilia extends Model {
         horario_trabalho_fim: Sequelize.STRING,
         telefone_trabalho: Sequelize.STRING,
         renda: Sequelize.NUMBER,
+        cpf: Sequelize.STRING,
+        certidao_nascimento: Sequelize.STRING,
+        pis_pasep: Sequelize.STRING,
       },
       {
         modelName: 'membroFamilia',
