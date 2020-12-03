@@ -1,6 +1,7 @@
 'use strict';
 
 import Sequelize, { Model } from 'sequelize';
+import { createProtocol } from '../util/generators';
 
 class Inscricao extends Model {
   static init(sequelize) {
@@ -13,8 +14,21 @@ class Inscricao extends Model {
         posicao: Sequelize.INTEGER,
         deferido: Sequelize.BOOLEAN,
         matricula_id: Sequelize.INTEGER,
+        protocolo: Sequelize.INTEGER,
       },
       {
+        hooks: {
+          afterSave: (inscricao) => {
+            this.update(
+              { protocolo: createProtocol(inscricao.id) },
+              {
+                where: {
+                  id: inscricao.id,
+                },
+              }
+            );
+          },
+        },
         modelName: 'inscricao',
         tableName: 'cvi_inscricao',
         sequelize,
@@ -24,6 +38,9 @@ class Inscricao extends Model {
   static associate(models) {
     this.belongsTo(models.matricula, {
       foreignKey: 'matricula_id',
+    });
+    this.hasMany(models.membroFamilia, {
+      foreignKey: 'inscricao_id',
     });
   }
 }
