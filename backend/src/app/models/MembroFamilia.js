@@ -15,6 +15,14 @@ class MembroFamilia extends Model {
         cpf: Sequelize.STRING,
         certidao_nascimento: Sequelize.STRING,
         pis_pasep: Sequelize.STRING,
+        data_cadastro: {
+          type: Sequelize.DATE,
+          field: 'data_cadastro',
+        },
+        data_modificacao: {
+          type: Sequelize.DATE,
+          field: 'data_modificacao',
+        },
       },
       {
         modelName: 'membroFamilia',

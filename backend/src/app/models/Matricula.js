@@ -7,6 +7,14 @@ class Matricula extends Model {
     super.init(
       {
         codigo: Sequelize.INTEGER,
+        data_cadastro: {
+          type: Sequelize.DATE,
+          field: 'data_cadastro',
+        },
+        data_modificacao: {
+          type: Sequelize.DATE,
+          field: 'data_modificacao',
+        },
       },
       {
         modelName: 'matricula',

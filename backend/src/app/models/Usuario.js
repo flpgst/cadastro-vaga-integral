@@ -12,6 +12,14 @@ class Usuario extends Model {
         email: Sequelize.STRING,
         senha: Sequelize.STRING,
         ativo: Sequelize.BOOLEAN,
+        data_cadastro: {
+          type: Sequelize.DATE,
+          field: 'data_cadastro',
+        },
+        data_modificacao: {
+          type: Sequelize.DATE,
+          field: 'data_modificacao',
+        },
       },
       {
         modelName: 'usuario',

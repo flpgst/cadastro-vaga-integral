@@ -8,6 +8,14 @@ class Grupo extends Model {
       {
         nome: Sequelize.STRING,
         ativo: Sequelize.BOOLEAN,
+        data_cadastro: {
+          type: Sequelize.DATE,
+          field: 'data_cadastro',
+        },
+        data_modificacao: {
+          type: Sequelize.DATE,
+          field: 'data_modificacao',
+        },
       },
       {
         modelName: 'grupo',

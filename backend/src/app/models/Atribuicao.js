@@ -11,6 +11,14 @@ class Atribuicao extends Model {
           field: 'instituicao_id',
         },
         ativo: Sequelize.BOOLEAN,
+        data_cadastro: {
+          type: Sequelize.DATE,
+          field: 'data_cadastro',
+        },
+        data_modificacao: {
+          type: Sequelize.DATE,
+          field: 'data_modificacao',
+        },
       },
       {
         modelName: 'atribuicao',

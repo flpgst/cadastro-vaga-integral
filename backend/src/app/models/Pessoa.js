@@ -8,6 +8,14 @@ class Pessoa extends Model {
       {
         nome: Sequelize.STRING,
         cpf_cnpj: Sequelize.STRING,
+        data_cadastro: {
+          type: Sequelize.DATE,
+          field: 'data_cadastro',
+        },
+        data_modificacao: {
+          type: Sequelize.DATE,
+          field: 'data_modificacao',
+        },
       },
       {
         modelName: 'pessoa',

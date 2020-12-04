@@ -15,6 +15,22 @@ class Inscricao extends Model {
         deferido: Sequelize.BOOLEAN,
         matricula_id: Sequelize.INTEGER,
         protocolo: Sequelize.INTEGER,
+        pessoa_criacao: {
+          type: Sequelize.INTEGER,
+          field: 'pessoa_criacao_id',
+        },
+        pessoa_modificacao: {
+          type: Sequelize.INTEGER,
+          field: 'pessoa_modificacao_id',
+        },
+        data_cadastro: {
+          type: Sequelize.DATE,
+          field: 'data_cadastro',
+        },
+        data_modificacao: {
+          type: Sequelize.DATE,
+          field: 'data_modificacao',
+        },
       },
       {
         hooks: {

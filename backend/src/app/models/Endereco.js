@@ -13,6 +13,14 @@ class Endereco extends Model {
         bairro: Sequelize.STRING,
         cep: Sequelize.STRING,
         cidade_id: Sequelize.INTEGER,
+        data_cadastro: {
+          type: Sequelize.DATE,
+          field: 'data_cadastro',
+        },
+        data_modificacao: {
+          type: Sequelize.DATE,
+          field: 'data_modificacao',
+        },
       },
       {
         modelName: 'endereco',
