@@ -93,5 +93,19 @@ class InscricaoController {
       return res.status(error.status).json({ message: error });
     }
   }
+
+  async getById(req, res) {
+    if (!req.authorized) {
+      return res.status(401).json({ message: 'Não Autorizado' });
+    }
+
+    const { id } = req.params;
+
+    const inscricao = await Inscricao.findByPk(id, {
+      include: { nested: true, all: true },
+    });
+
+    return res.json(inscricao);
+  }
 }
 export default new InscricaoController();
