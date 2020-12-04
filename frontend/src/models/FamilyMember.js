@@ -5,6 +5,9 @@ export default class FamilyMember {
     this.nome = null;
     this.kinship = {};
     this.income = null;
+    this.cpf = null;
+    this.certidaoNascimento = null;
+    this.pisPasep = null;
 
     this.workplace = {
       name: null,
@@ -25,5 +28,9 @@ export default class FamilyMember {
     }
 
     return true;
+  }
+
+  clear() {
+    this.constructor();
   }
 }
