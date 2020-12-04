@@ -42,7 +42,7 @@ class InscricaoController {
         .json({ message: 'Certidão de Nascimento inválida' });
 
     try {
-      await Inscricao.create({
+      const inscricaoCreated = await Inscricao.create({
         ...inscricao,
         pessoa_criacao: req.pessoaId,
       }).then(({ dataValues }) => {
@@ -59,7 +59,7 @@ class InscricaoController {
           });
         });
       });
-      return res.status(200).json(inscricao);
+      return res.status(200).json(inscricaoCreated);
     } catch (error) {
       return res.status(error.status).json({ message: error });
     }
