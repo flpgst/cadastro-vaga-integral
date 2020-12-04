@@ -3,7 +3,7 @@
     <login v-if="!isAuthenticated()"> </login>
     <v-row v-else>
       <v-col cols="12">
-        <v-app-bar app color="primary" dark>
+        <v-app-bar app color="primary" dark id="app-bar">
           <v-row>
             <v-col
               v-text="user.nome"
