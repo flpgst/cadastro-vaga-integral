@@ -3,34 +3,71 @@
     <v-col cols="6">
       <CPTSelect
         v-model="member.kinship"
-        label="Grau de Parentesco*"
+        label="Grau de parentesco*"
         :items="kinshipDegrees"
         item-text="nome"
         return-object
+        :required="!member.isEmpty()"
         :validator="[
-          v =>
-            member.nome || member.workplace.name || !member.endereco.isEmpty()
-              ? !isEmpty(v) || 'Esse é um campo obrigatório'
-              : true
+          v => member.isEmpty() || !isEmpty(v) || 'Este campo é obrigatório'
         ]"
       />
     </v-col>
     <v-col cols="6">
       <CPTInput
         v-model="member.nome"
-        label="Nome*"
-        :required="
-          !!(
-            !isEmpty(member.kinship) ||
-            member.workplace.name ||
-            !member.endereco.isEmpty()
-          )
-        "
+        label="Nome completo*"
+        :required="!member.isEmpty()"
       />
     </v-col>
 
+    <v-col cols="4">
+      <CPTSelect
+        v-model="documentType"
+        label="Documento"
+        :items="['CPF', 'Certidão de Nascimento']"
+        @input="member.cpf = member.certidaoNascimento = null"
+      />
+    </v-col>
+
+    <v-col cols="4">
+      <CPTInput
+        v-if="documentType === 'CPF'"
+        v-model="member.cpf"
+        label="CPF*"
+        :required="!member.isEmpty()"
+        key="cpf"
+        validate-on-blur
+        :validator="[
+          cpf => member.isEmpty() || isValidCPF(cpf) || 'CPF inválido'
+        ]"
+        v-maska="'###.###.###-##'"
+      />
+      <CPTInput
+        v-else
+        v-model="member.certidaoNascimento"
+        label="Certidão de nascimento*"
+        :required="!member.isEmpty()"
+        key="certidao_nascimento"
+        validate-on-blur
+        counter="32"
+        :validator="[
+          certidao =>
+            member.isEmpty() ||
+            !certidao ||
+            certidao.length === 32 ||
+            'Certidão de nascimento inválida'
+        ]"
+        v-maska="'################################'"
+      />
+    </v-col>
+
+    <v-col cols="4">
+      <CPTInput v-model="member.pisPasep" label="PIS/PASEP" counter />
+    </v-col>
+
     <v-col cols="3">
-      <CPTInput v-model="member.workplace.name" label="Local de Trabalho" />
+      <CPTInput v-model="member.workplace.name" label="Local de trabalho" />
     </v-col>
     <v-col cols="3">
       <CPTInput
@@ -47,7 +84,7 @@
     <v-col cols="3">
       <CPTInput
         v-model="member.workplace.start"
-        label="Horário entrada"
+        label="Horário de entrada"
         v-maska="'##:##'"
         :disabled="!member.workplace.name"
         :validator="[time => validateTime(time) || 'Horário inválida']"
@@ -57,7 +94,7 @@
       <CPTInput
         v-model="member.workplace.end"
         :disabled="!member.workplace.name"
-        label="Horário saída"
+        label="Horário de saída"
         v-maska="'##:##'"
         :validator="[time => validateTime(time) || 'Horário inválida']"
       />
@@ -174,6 +211,7 @@ import validateTime from "@/utils/validateTime";
 import FamilyMember from "@/models/FamilyMember.js";
 
 import { isEmpty } from "lodash";
+import { cpf } from "cpf-cnpj-validator";
 
 export default {
   name: "form-member-family",
@@ -195,12 +233,19 @@ export default {
   },
   mounted() {
     this.showAddressForm = !this.member.endereco.isEmpty();
+
+    this.documentType =
+      (this.member.cpf && "CPF") ||
+      (this.member.certidaoNascimento && "Certidão de Nascimento") ||
+      "CPF";
+
     this.getKinshipDegrees();
   },
   data: () => ({
     dialogExclusao: false,
     kinshipDegrees: [],
     showAddressForm: false,
+    documentType: null,
 
     cities: [],
     state: null
@@ -239,6 +284,7 @@ export default {
       if (!this.states) this.$store.dispatch("address/getStates");
     },
     isEmpty,
+    isValidCPF: cpf.isValid,
     onClickRemoveButton() {
       if (this.member.isEmpty()) return this.$emit("remove");
 
@@ -252,6 +298,15 @@ export default {
       this.member.endereco.cidade = this.$store.state.address.cidadeDefault;
     },
     validateTime
+  },
+  watch: {
+    member() {
+      this.showAddressForm = !this.member.endereco.isEmpty();
+      this.documentType =
+        (this.member.cpf && "CPF") ||
+        (this.member.certidaoNascimento && "Certidão de Nascimento") ||
+        "CPF";
+    }
   }
 };
 </script>
