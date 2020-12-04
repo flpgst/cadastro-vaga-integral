@@ -59,7 +59,7 @@ class InscricaoController {
           });
         });
       });
-      return res.status(200).json({ message: 'Inscrição criada com sucesso' });
+      return res.status(200).json(inscricao);
     } catch (error) {
       return res.status(error.status).json({ message: error });
     }
