@@ -4,11 +4,12 @@
     :icon="!!icon && !label"
     :label="label"
     :color="color"
-    :outlined="!!label"
+    :outlined="icon && !!label"
+    :text="!icon"
     @click="$emit('click')"
     rounded
   >
-    <v-icon :left="!!label" :center="!label" v-text="icon" />
+    <v-icon v-if="icon" :left="!!label" :center="!label" v-text="icon" />
     <span v-if="label" v-text="label" />
   </v-btn>
 </template>
