@@ -9,7 +9,7 @@
           autofocus
           label="Matrícula*"
           counter="11"
-          @input="student = null"
+          @input="onInputEnrollment"
           @keydown.enter="isValidEnrollment && getStudent(enrollment)"
           type="number"
         />
@@ -47,26 +47,28 @@
           <CPTInput v-model="student.nome" label="Nome*" disabled required />
         </v-col>
 
-        <v-col :cols="isProcessoJudicial ? 4 : 6">
-          <v-switch
-            v-model="vulnerabilidadeSocial"
-            label="Criança em vulnerabilidade social"
-          />
-        </v-col>
-        <v-col :cols="isProcessoJudicial ? 3 : 6">
+        <v-col cols="auto" class="py-0">
           <v-switch
             v-model="isProcessoJudicial"
             @click="processoJudicial = null"
-            label="Cadastro por processo judicial"
+            label="Cadastro no Fila Única com processo judicial"
           />
         </v-col>
-
-        <v-col v-if="isProcessoJudicial" cols="5">
+        <v-col v-if="isProcessoJudicial" class="py-0">
           <CPTInput
             v-model="processoJudicial"
             label="Número do processo*"
             required
           />
+        </v-col>
+
+        <v-col cols="12" class="d-flex">
+          <v-col cols="auto" class="pa-0">
+            <v-switch
+              v-model="vulnerabilidadeSocial"
+              label="Criança em vulnerabilidade social"
+            />
+          </v-col>
         </v-col>
 
         <v-col cols="12">
@@ -75,6 +77,7 @@
             :items="MEIOS_TRANSPORTE"
             item-text="text"
             item-value="value"
+            required
             label="Família possui meio de transporte próprio*"
           />
         </v-col>
@@ -283,16 +286,10 @@
         <v-divider />
 
         <v-card-actions class="d-flex justify-end py-3">
-          <CPTBtn
-            label="Não"
-            @click="dialog = false"
-            color="red"
-            icon="mdi-close"
-          />
+          <CPTBtn label="Não" @click="dialog = false" />
           <CPTBtn
             label="Sim"
             @click="criarInscricao(inscricao), (dialog = false)"
-            icon="mdi-check"
           />
         </v-card-actions>
       </v-card>
@@ -315,7 +312,8 @@ import Inscricao from "@/models/Inscricao";
 import validateTime from "@/utils/validateTime";
 
 const MEIOS_TRANSPORTE = [
-  { text: "Não possui", value: null },
+  { text: "Escolha uma opção", value: null },
+  { text: "Não possui", value: "NAO_POSSUI" },
   { text: "Carro", value: "CARRO" },
   { text: "Moto", value: "MOTO" }
 ];
@@ -397,16 +395,11 @@ export default {
 
       this.$http
         .post("inscricao", inscricao)
-        .then(() => {
+        .then(({ data: inscricao }) => {
           this.showMessage("Inscrição criada com sucesso", "success");
-          this.$refs.form.reset();
-          this.student = this.inscricao = this.enrollment = null;
-          this.saving = false;
+          this.$router.push(`/protocolo/${inscricao.id}`);
         })
         .catch(error => {
-          this.$refs.form.reset();
-          this.student = this.inscricao = this.enrollment = null;
-
           this.showMessage(error, "error");
           this.saving = false;
         });
@@ -451,6 +444,13 @@ export default {
 
       this.dialog = true;
     },
+    onInputEnrollment() {
+      this.student = null;
+      this.mother?.clear();
+      this.father?.clear();
+      this.newFamilyMember?.clear();
+      this.members = [];
+    },
     onSubmit() {
       if (!this.$refs.form.validate())
         return this.showMessage(
@@ -466,7 +466,7 @@ export default {
 
       const family = this.family.map(member => ({
         ...member,
-        income: Number(member.income?.replace(",", ".")),
+        income: Number(member.income?.replace(",", ".")) || 0,
         endereco: member.endereco.isEmpty() ? null : member.endereco
       }));
 
