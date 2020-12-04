@@ -1,11 +1,9 @@
 import Usuario from '../models/Usuario';
 import Atribuicao from '../models/Atribuicao';
+import Pessoa from '../models/Pessoa';
 
 export default async (req, res, next) => {
-  const user = await Usuario.findOne({
-    where: {
-      id: req.userId,
-    },
+  const user = await Usuario.findByPk(req.userId, {
     include: [
       {
         model: Atribuicao,
@@ -15,6 +13,14 @@ export default async (req, res, next) => {
       },
     ],
   });
+
+  const pessoa = await Pessoa.findOne({
+    where: {
+      usuario_id: req.userId,
+    },
+  });
+
+  req.pessoaId = pessoa.id;
 
   req.superAdmin =
     user.atribuicoes[0].dataValues.grupo.dataValues.nome ===

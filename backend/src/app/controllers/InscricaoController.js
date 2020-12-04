@@ -42,7 +42,10 @@ class InscricaoController {
         .json({ message: 'Certidão de Nascimento inválida' });
 
     try {
-      await Inscricao.create(inscricao).then(({ dataValues }) => {
+      await Inscricao.create({
+        ...inscricao,
+        pessoa_criacao: req.pessoaId,
+      }).then(({ dataValues }) => {
         inscricao.membros.map(async (membro) => {
           const endereco =
             membro.endereco && (await Endereco.create(membro.endereco));
