@@ -7,7 +7,7 @@
     :rules="rules"
     @click:append="onClickAppend"
     @keydown="event => $emit('keydown', event)"
-    clearable
+    :clearable="clearable"
     flat
     outlined
     rounded
@@ -18,6 +18,10 @@
 export default {
   name: "CVIInput",
   props: {
+    clearable: {
+      type: Boolean,
+      default: true
+    },
     counter: {
       type: [Boolean, Number, String],
       default: null,
