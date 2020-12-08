@@ -20,6 +20,7 @@ routes.get('/inscricao', InscricaoController.index);
 routes.get('/inscricao/:id', InscricaoController.getById);
 routes.put('/inscricao/:id', InscricaoController.update);
 routes.get('/matricula/', MatriculaController.index);
+routes.get('/matricula/:codigo/inscricao', MatriculaController.getInscricao);
 routes.get('/parentesco', ParentescoController.index);
 routes.get('/cidade', CidadeController.index);
 routes.get('/estado', EstadoController.index);
