@@ -86,7 +86,16 @@
           <v-col cols="12">
             <CPTSubtitle label="Endereço" />
           </v-col>
-          <v-col cols="6">
+
+          <v-col cols="2">
+            <CPTInput
+              v-model="student.endereco.cep"
+              label="CEP*"
+              required
+              v-maska="'#####-###'"
+            />
+          </v-col>
+          <v-col cols="4">
             <CPTInput v-model="student.endereco.rua" label="Rua*" required />
           </v-col>
           <v-col cols="2">
@@ -471,6 +480,7 @@ export default {
 
       const inscricao = new Inscricao(
         this.student.matricula.id,
+        this.student.endereco,
         family,
         this.transporteProprio,
         this.vulnerabilidadeSocial,
