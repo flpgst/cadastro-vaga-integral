@@ -12,7 +12,8 @@ export default class Inscricao {
       ? {
           ...endereco,
           logradouro: endereco.rua,
-          cidade_id: endereco.cidade.id
+          cidade_id: endereco.cidade.id,
+          cep: endereco.cep.replace("-", "")
         }
       : null;
 
@@ -41,7 +42,8 @@ export default class Inscricao {
           ? {
               ...endereco,
               logradouro: endereco.rua,
-              cidade_id: endereco.cidade.id
+              cidade_id: endereco.cidade.id,
+              cep: endereco.cep.replace("-", "")
             }
           : null
       })
