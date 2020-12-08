@@ -53,7 +53,7 @@ class InscricaoController {
 
     if (
       !req.superAdmin &&
-      req.unidadeEnsinoId !== matricula.dataValues.unidade_ensino_id
+      req.unidadeEnsinoId !== matricula.dataValues.unidadeEnsinoId
     )
       return res.status(401).json({
         message: 'Você não tem permissão para cadastrar esta matrícula',

@@ -31,7 +31,7 @@ export default async (req, res, next) => {
   if (
     user.atribuicoes[0].dataValues.grupo.dataValues.nome ===
       'Super Administrador' ||
-    user.atribuicoes[0].dataValues.grupo.dataValues.nome === 'Secretario'
+    user.atribuicoes[0].dataValues.grupo.dataValues.nome === 'Secretário'
   ) {
     req.authorized = true;
     req.unidadeEnsinoId = user.atribuicoes[0].dataValues.unidadeEnsinoId;
