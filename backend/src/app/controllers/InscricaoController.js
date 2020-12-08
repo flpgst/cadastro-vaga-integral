@@ -41,7 +41,7 @@ class InscricaoController {
           complemento: inscricao.endereco.complemento,
           bairro: inscricao.endereco.bairro,
           cep: inscricao.endereco.cep,
-          cidade_id: inscricao.endereco.cep,
+          cidade_id: inscricao.endereco.cidade_id,
         },
         {
           where: {
