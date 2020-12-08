@@ -1,6 +1,7 @@
 export default class Address {
   constructor() {
     this.rua = null;
+    this.cep = null;
     this.numero = null;
     this.bairro = null;
     this.cidade = {};
