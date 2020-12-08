@@ -42,23 +42,41 @@ class InscricaoController {
         .json({ message: 'Certidão de Nascimento inválida' });
 
     try {
-      const inscricaoCreated = await Inscricao.create({
-        ...inscricao,
-        pessoa_criacao: req.pessoaId,
-      }).then(({ dataValues }) => {
-        inscricao.membros.map(async (membro) => {
-          const endereco =
-            membro.endereco && (await Endereco.create(membro.endereco));
+      const renda_percapta = (
+        inscricao.membros.reduce(
+          (renda, membro) => (renda += membro.renda || 0),
+          0
+        ) /
+        (inscricao.membros.length + 1)
+      ).toFixed(2);
 
-          await MembroFamilia.create({
-            ...membro,
-            inscricao_id: dataValues.id,
-            endereco_id:
-              endereco?.id ||
-              matricula.dataValues.pessoa.dataValues.endereco.dataValues.id,
-          });
-        });
+      let inscricaoCreated = await Inscricao.create({
+        ...inscricao,
+        renda_percapta,
+        pessoa_criacao: req.pessoaId,
       });
+
+      inscricaoCreated.dataValues.membroFamilia = [];
+
+      for await (let membro of inscricao.membros) {
+        let endereco;
+        if (membro.endereco)
+          endereco = await Endereco.create({
+            ...membro.endereco,
+          });
+        const membroFamilia = await MembroFamilia.create({
+          ...membro,
+          inscricao_id: inscricaoCreated.dataValues.id,
+          endereco_id:
+            endereco?.id ||
+            matricula.dataValues.pessoa.dataValues.endereco.dataValues.id,
+        });
+
+        inscricaoCreated.dataValues.membroFamilia.push(
+          membroFamilia.dataValues
+        );
+      }
+
       return res.status(200).json(inscricaoCreated);
     } catch (error) {
       return res.status(error.status).json({ message: error });
