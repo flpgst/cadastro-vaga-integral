@@ -404,7 +404,7 @@ export default {
 
       this.$http
         .post("inscricao", inscricao)
-        .then(({ data: inscricao }) => {
+        .then(inscricao => {
           this.$router.push(`/protocolo/${inscricao.id}`);
         })
         .catch(error => {
@@ -420,11 +420,7 @@ export default {
 
       if (!this.state) return;
 
-      const { data: cities } = await this.$http.get(
-        `cidade?estado_id=${this.state.id}`
-      );
-
-      this.cities = cities;
+      this.cities = await this.$http.get(`cidade?estado_id=${this.state.id}`);
     },
     getStates() {
       if (!this.states) this.$store.dispatch("address/getStates");
@@ -433,7 +429,7 @@ export default {
       this.loading = true;
       this.$http
         .get("matricula", { params: { codigo } })
-        .then(({ data: student }) => {
+        .then(student => {
           this.student = new Student(student);
 
           this.getStates();
@@ -443,6 +439,7 @@ export default {
           this.loading = false;
         })
         .catch(error => {
+          console.log(error);
           this.loading = false;
           this.showMessage(error, "error");
         });

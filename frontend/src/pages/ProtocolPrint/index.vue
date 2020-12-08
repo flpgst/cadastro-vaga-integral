@@ -102,9 +102,7 @@ export default {
   },
   methods: {
     async getInscricao() {
-      const { data } = await this.$http.get(`inscricao/${this.id}`);
-
-      this.inscricao = data;
+      this.inscricao = await this.$http.get(`inscricao/${this.id}`);
 
       setTimeout(this.print, 100);
     },

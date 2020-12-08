@@ -68,14 +68,17 @@ export default {
     },
 
     async login() {
-      const { data } = await this.$http.post("login", {
-        login: this.username,
-        senha: this.password
-      });
+      const { token, id, nome_exibicao: nome } = await this.$http.post(
+        "login",
+        {
+          login: this.username,
+          senha: this.password
+        }
+      );
 
-      localStorage.setItem("token", data.token);
+      localStorage.setItem("token", token);
 
-      const { id, nome_exibicao: nome } = data;
+      console.log(name, id, token);
 
       localStorage.setItem("user", JSON.stringify({ id, nome }));
 
