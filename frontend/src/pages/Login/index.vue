@@ -1,6 +1,11 @@
 <template>
   <v-container class="fill-height d-flex justify-center">
-    <v-card flat rounded max-width="550" color=" grey lighten-5">
+    <v-card flat rounded max-width="600" color="grey lighten-5">
+      <v-card-title
+        v-text="'Cadastro de Vaga Integral'"
+        class="grey--text text-h4"
+      />
+
       <v-form
         class="d-flex flex-wrap"
         ref="form"
