@@ -16,6 +16,7 @@
           <CPMInput
             v-model="username"
             label="Usuário"
+            :clearable="false"
             :uppercase="false"
             :validator="[v => !!v]"
           />
@@ -27,6 +28,7 @@
             :type="showPassword ? 'text' : 'password'"
             :append-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'"
             :uppercase="false"
+            :clearable="false"
             @click:append="showPassword = !showPassword"
             :validator="[v => !!v]"
           />
