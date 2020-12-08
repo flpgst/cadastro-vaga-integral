@@ -12,6 +12,45 @@ class InscricaoController {
     const inscricao = req.body;
     const matricula = await findMatriculaById(inscricao.matricula_id);
 
+    const {
+      logradouro,
+      numero,
+      complemento,
+      bairro,
+      cep,
+      cidade_id,
+      id,
+    } = matricula.dataValues.pessoa.dataValues.endereco.dataValues;
+
+    const endereco = [
+      logradouro,
+      numero,
+      complemento,
+      bairro,
+      cep,
+      id,
+      cidade_id,
+    ];
+
+    if (endereco.find((campo) => campo !== inscricao.endereco[campo])) {
+      console.log('endereco :>> ', logradouro);
+      await Endereco.update(
+        {
+          logradouro: inscricao.endereco.logradouro,
+          numero: inscricao.endereco.numero,
+          complemento: inscricao.endereco.complemento,
+          bairro: inscricao.endereco.bairro,
+          cep: inscricao.endereco.cep,
+          cidade_id: inscricao.endereco.cep,
+        },
+        {
+          where: {
+            id,
+          },
+        }
+      );
+    }
+
     if (
       !req.superAdmin &&
       req.unidadeEnsinoId !== matricula.dataValues.unidade_ensino_id
