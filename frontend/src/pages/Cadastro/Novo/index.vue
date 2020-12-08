@@ -480,6 +480,7 @@ export default {
 
       const inscricao = new Inscricao(
         this.student.matricula.id,
+        this.student.endereco,
         family,
         this.transporteProprio,
         this.vulnerabilidadeSocial,

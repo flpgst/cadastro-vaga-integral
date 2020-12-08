@@ -1,12 +1,21 @@
 export default class Inscricao {
   constructor(
     matricula_id,
+    endereco,
     membros,
     transporte_proprio,
     vulnerabilidade_social,
     processo_judicial
   ) {
     this.matricula_id = matricula_id;
+    this.endereco = endereco
+      ? {
+          ...endereco,
+          logradouro: endereco.rua,
+          cidade_id: endereco.cidade.id
+        }
+      : null;
+
     this.membros = membros.map(
       ({
         nome,
