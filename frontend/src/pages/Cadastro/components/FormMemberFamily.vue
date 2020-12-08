@@ -183,15 +183,10 @@
         <v-divider />
 
         <v-card-actions class="d-flex justify-end py-3">
-          <CPTBtn
-            label="Não"
-            @click="dialogExclusao = false"
-            icon="mdi-close"
-          />
+          <CPTBtn label="Não" @click="dialogExclusao = false" />
           <CPTBtn
             label="Sim"
             @click="$emit('remove'), (dialogExclusao = false)"
-            icon="mdi-check"
           />
         </v-card-actions>
       </v-card>

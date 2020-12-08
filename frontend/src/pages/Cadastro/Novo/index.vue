@@ -396,7 +396,6 @@ export default {
       this.$http
         .post("inscricao", inscricao)
         .then(({ data: inscricao }) => {
-          this.showMessage("Inscrição criada com sucesso", "success");
           this.$router.push(`/protocolo/${inscricao.id}`);
         })
         .catch(error => {
