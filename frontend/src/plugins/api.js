@@ -13,4 +13,11 @@ server.interceptors.request.use(config => {
   return config;
 });
 
+server.interceptors.response.use(
+  ({ data }) => data,
+  error => {
+    throw error.response.data.message;
+  }
+);
+
 export default server;

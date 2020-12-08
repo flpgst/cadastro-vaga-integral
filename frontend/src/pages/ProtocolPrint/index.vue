@@ -44,8 +44,20 @@
           {{ format(parseISO(inscricao.data_cadastro), "dd/MM/yyyy HH:mm") }}
         </v-col>
 
-        <v-col>
-          <v-divider v-if="protocolo === 1" />
+        <v-col
+          v-if="protocolo === 1"
+          cols="12"
+          class="d-flex flex-wrap align-center pa-0"
+        >
+          <v-col cols="auto">
+            <v-icon>
+              mdi-content-cut
+            </v-icon>
+          </v-col>
+
+          <v-col>
+            <v-divider />
+          </v-col>
         </v-col>
       </v-col>
     </template>
@@ -90,9 +102,7 @@ export default {
   },
   methods: {
     async getInscricao() {
-      const { data } = await this.$http.get(`inscricao/${this.id}`);
-
-      this.inscricao = data;
+      this.inscricao = await this.$http.get(`inscricao/${this.id}`);
 
       setTimeout(this.print, 100);
     },

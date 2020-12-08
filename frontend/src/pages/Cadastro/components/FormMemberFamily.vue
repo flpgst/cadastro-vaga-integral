@@ -272,16 +272,12 @@ export default {
 
       if (!this.state) return;
 
-      const { data: cities } = await this.$http.get(
-        `cidade?estado_id=${this.state.id}`
-      );
-
-      this.cities = cities;
+      this.cities = await this.$http.get(`cidade?estado_id=${this.state.id}`);
     },
-    getKinshipDegrees() {
-      this.$http
+    async getKinshipDegrees() {
+      this.kinshipDegrees = await this.$http
         .get("parentesco")
-        .then(({ data }) => (this.kinshipDegrees = data));
+        .catch(error => this.showMessage(error, "error"));
     },
     getStates() {
       if (!this.states) this.$store.dispatch("address/getStates");

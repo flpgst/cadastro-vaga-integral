@@ -1,6 +1,11 @@
 <template>
   <v-container class="fill-height d-flex justify-center">
-    <v-card flat rounded max-width="550" color=" grey lighten-5">
+    <v-card flat rounded max-width="600" color="grey lighten-5">
+      <v-card-title
+        v-text="'Cadastro de Vaga Integral'"
+        class="grey--text text-h4"
+      />
+
       <v-form
         class="d-flex flex-wrap"
         ref="form"
@@ -11,6 +16,7 @@
           <CPMInput
             v-model="username"
             label="Usuário"
+            :clearable="false"
             :uppercase="false"
             :validator="[v => !!v]"
           />
@@ -22,6 +28,7 @@
             :type="showPassword ? 'text' : 'password'"
             :append-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'"
             :uppercase="false"
+            :clearable="false"
             @click:append="showPassword = !showPassword"
             :validator="[v => !!v]"
           />
@@ -61,14 +68,17 @@ export default {
     },
 
     async login() {
-      const { data } = await this.$http.post("login", {
-        login: this.username,
-        senha: this.password
-      });
+      const { token, id, nome_exibicao: nome } = await this.$http.post(
+        "login",
+        {
+          login: this.username,
+          senha: this.password
+        }
+      );
 
-      localStorage.setItem("token", data.token);
+      localStorage.setItem("token", token);
 
-      const { id, nome_exibicao: nome } = data;
+      console.log(name, id, token);
 
       localStorage.setItem("user", JSON.stringify({ id, nome }));
 
