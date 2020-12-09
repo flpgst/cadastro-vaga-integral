@@ -60,29 +60,27 @@ export default {
     onSubmit() {
       if (!this.$refs.form.validate())
         return this.showMessage(
-          "Você precisa informar o nome de usuário e senha",
+          "Você precisa informar o nome de usuário e a senha",
           "error"
         );
 
       this.login();
     },
 
-    async login() {
-      const { token, id, nome_exibicao: nome } = await this.$http.post(
-        "login",
-        {
+    login() {
+      this.$http
+        .post("login", {
           login: this.username,
           senha: this.password
-        }
-      );
+        })
+        .then(({ token, id, nome_exibicao: nome }) => {
+          localStorage.setItem("token", token);
 
-      localStorage.setItem("token", token);
+          localStorage.setItem("user", JSON.stringify({ id, nome }));
 
-      console.log(name, id, token);
-
-      localStorage.setItem("user", JSON.stringify({ id, nome }));
-
-      window.location.reload();
+          window.location.reload();
+        })
+        .catch(error => this.showMessage(error, "error"));
     }
   }
 };

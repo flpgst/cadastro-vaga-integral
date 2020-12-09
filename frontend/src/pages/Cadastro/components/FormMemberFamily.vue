@@ -272,7 +272,9 @@ export default {
 
       if (!this.state) return;
 
-      this.cities = await this.$http.get(`cidade?estado_id=${this.state.id}`);
+      this.cities = await this.$http
+        .get(`cidade?estado_id=${this.state.id}`)
+        .catch(error => this.showMessage(error, "error"));
     },
     async getKinshipDegrees() {
       this.kinshipDegrees = await this.$http

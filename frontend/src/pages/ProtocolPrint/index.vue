@@ -102,7 +102,11 @@ export default {
   },
   methods: {
     async getInscricao() {
-      this.inscricao = await this.$http.get(`inscricao/${this.id}`);
+      this.inscricao = await this.$http
+        .get(`inscricao/${this.id}`)
+        .error(error => this.showMessage(error, "error"));
+
+      if (!this.inscricao) return;
 
       setTimeout(this.print, 100);
     },
