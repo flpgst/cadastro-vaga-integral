@@ -27,6 +27,12 @@
                   CONSULTA DE CADASTROS
                 </v-btn>
               </v-col>
+
+              <v-col cols="auto">
+                <v-btn text depressed to="/protocolo">
+                  IMPRIMIR PROTOCOLO
+                </v-btn>
+              </v-col>
             </v-col>
           </v-row>
 

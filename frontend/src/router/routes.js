@@ -3,8 +3,13 @@ import NovoCadastro from "@/pages/Cadastro/Novo";
 const ListaCadastros = () =>
   import(/* webpackChunkName: "lista-cadastros" */ "@/pages/Cadastro/Lista");
 
-const ProtocolPrint = () =>
-  import(/* webpackChunkName: "impressao-protocolo" */ "@/pages/ProtocolPrint");
+const ImprimirProtocolo = () =>
+  import(
+    /* webpackChunkName: "imprimir-protocolo" */ "@/pages/Protocolo/Imprimir"
+  );
+
+const BuscarProtocolo = () =>
+  import(/* webpackChunkName: "buscar-protocolo" */ "@/pages/Protocolo/Buscar");
 
 const routes = [
   {
@@ -18,10 +23,15 @@ const routes = [
     component: ListaCadastros
   },
   {
+    path: "/protocolo",
+    name: "Imprimir Protocolo",
+    component: BuscarProtocolo
+  },
+  {
     path: "/protocolo/:id",
     name: "Impressão de Protocolo",
     props: true,
-    component: ProtocolPrint
+    component: ImprimirProtocolo
   }
 ];
 
