@@ -22,7 +22,7 @@
                 </v-btn>
               </v-col>
 
-              <v-col cols="auto">
+              <v-col v-if="isAdmin()" cols="auto">
                 <v-btn text depressed to="/cadastros">
                   CONSULTA DE CADASTROS
                 </v-btn>
@@ -57,7 +57,7 @@
 <script>
 import CPTSnackbar from "@/components/Snackbar";
 import Login from "@/pages/Login";
-import { isAuthenticated, logout, getUser } from "@/plugins/security";
+import { isAdmin, isAuthenticated, logout, getUser } from "@/plugins/security";
 
 export default {
   name: "App",
@@ -71,6 +71,7 @@ export default {
     user: getUser()
   }),
   methods: {
+    isAdmin,
     isAuthenticated,
     logout
   }

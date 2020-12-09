@@ -73,10 +73,10 @@ export default {
           login: this.username,
           senha: this.password
         })
-        .then(({ token, id, nome_exibicao: nome }) => {
+        .then(({ token, id, nome_exibicao: nome, permissao: role }) => {
           localStorage.setItem("token", token);
 
-          localStorage.setItem("user", JSON.stringify({ id, nome }));
+          localStorage.setItem("user", JSON.stringify({ id, nome, role }));
 
           window.location.reload();
         })
