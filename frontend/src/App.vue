@@ -42,10 +42,9 @@
             <router-view />
           </v-container>
         </v-main>
-
-        <CPTSnackbar />
       </v-col>
     </v-row>
+    <CPTSnackbar />
   </v-app>
 </template>
 
