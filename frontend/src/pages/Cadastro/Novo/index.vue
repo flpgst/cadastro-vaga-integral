@@ -420,7 +420,9 @@ export default {
 
       if (!this.state) return;
 
-      this.cities = await this.$http.get(`cidade?estado_id=${this.state.id}`);
+      this.cities = await this.$http
+        .get(`cidade?estado_id=${this.state.id}`)
+        .error(error => this.showMessage(error, "error"));
     },
     getStates() {
       if (!this.states) this.$store.dispatch("address/getStates");
@@ -439,7 +441,6 @@ export default {
           this.loading = false;
         })
         .catch(error => {
-          console.log(error);
           this.loading = false;
           this.showMessage(error, "error");
         });
