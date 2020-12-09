@@ -422,7 +422,7 @@ export default {
 
       this.cities = await this.$http
         .get(`cidade?estado_id=${this.state.id}`)
-        .error(error => this.showMessage(error, "error"));
+        .catch(error => this.showMessage(error, "error"));
     },
     getStates() {
       if (!this.states) this.$store.dispatch("address/getStates");
