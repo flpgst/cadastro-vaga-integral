@@ -48,12 +48,15 @@ export default {
       this.$http
         .get(`matricula/${this.enrollment}/inscricao`)
         .then(inscricao => {
-          if (!inscricao.id)
+          if (!inscricao)
             return this.showMessage(
-              "Não existe nenhuma inscrição para essa matrícula"
+              "Não existe inscrição para essa matrícula",
+              "error"
             );
 
-          this.$router.push(inscricao.id);
+          this.showMessage();
+
+          this.$router.push(`/protocolo/${inscricao.id}`);
         })
         .catch(error => this.showMessage(error, "error"));
     }
