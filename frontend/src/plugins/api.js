@@ -16,7 +16,7 @@ server.interceptors.request.use(config => {
 server.interceptors.response.use(
   ({ data }) => data,
   error => {
-    throw new Error(error.response.data.error).message;
+    throw error.response.data.message;
   }
 );
 
