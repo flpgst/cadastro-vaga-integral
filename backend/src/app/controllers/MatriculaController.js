@@ -5,9 +5,6 @@ import ErrorHandler from '../util/error';
 class MatriculaController {
   async index(req, res, next) {
     try {
-      if (!req.authorized)
-        return res.status(401).json({ message: 'Não Autorizado' });
-
       const { codigo } = req.query;
 
       const matricula = await Matricula.findOne({
@@ -16,12 +13,13 @@ class MatriculaController {
       });
 
       if (!matricula) {
-        throw new ErrorHandler(500, 'Não existe Matricula');
+        throw new ErrorHandler(400, 'Matrícula inexistente');
       }
       if (!req.superAdmin && matricula.unidadeEnsinoId !== req.unidadeEnsinoId)
-        return res
-          .status(401)
-          .json({ message: 'Esta matrícula não está na sua unidade' });
+        throw new ErrorHandler(
+          500,
+          'Esta matrícula não pertence a sua unidade escolar'
+        );
 
       return res.json(matricula);
     } catch (error) {
@@ -31,9 +29,6 @@ class MatriculaController {
 
   async getInscricao(req, res, next) {
     try {
-      if (!req.authorized)
-        return res.status(401).json({ message: 'Não autorizado' });
-
       const { codigo } = req.params;
 
       const matricula = await Matricula.findOne({
@@ -46,12 +41,7 @@ class MatriculaController {
         where: { matricula_id: matricula.id },
       });
 
-      if (!inscricao) return res.status(200).json();
-      else
-        throw new ErrorHandler(
-          400,
-          'Já existe uma inscrição para esta matrícula'
-        );
+      return res.status(200).json(inscricao);
     } catch (error) {
       next(error);
     }

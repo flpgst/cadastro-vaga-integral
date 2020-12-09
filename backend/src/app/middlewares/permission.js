@@ -29,12 +29,13 @@ export default async (req, res, next) => {
     user.atribuicoes[0].dataValues.grupo.dataValues.nome === 'Gestor';
 
   if (
-    user.atribuicoes[0].dataValues.grupo.dataValues.nome ===
-      'Super Administrador' ||
-    user.atribuicoes[0].dataValues.grupo.dataValues.nome === 'Secretário'
+    user.atribuicoes[0].dataValues.grupo.dataValues.nome !==
+      'Super Administrador' &&
+    user.atribuicoes[0].dataValues.grupo.dataValues.nome !== 'Secretário'
   ) {
-    req.authorized = true;
-    req.unidadeEnsinoId = user.atribuicoes[0].dataValues.unidadeEnsinoId;
+    return res.status(401).json({ message: 'Não Autorizado' });
   }
+  req.unidadeEnsinoId = user.atribuicoes[0].dataValues.unidadeEnsinoId;
+
   next();
 };

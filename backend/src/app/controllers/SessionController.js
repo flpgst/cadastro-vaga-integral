@@ -2,30 +2,35 @@ import jwt from 'jsonwebtoken';
 
 import Usuario from '../models/Usuario';
 import authConfig from '../../config/auth';
+import ErrorHandler from '../util/error';
 
 class SessionController {
-  async store(req, res) {
-    const { login, senha } = req.body;
+  async store(req, res, next) {
+    try {
+      const { login, senha } = req.body;
 
-    const user = await Usuario.findOne({
-      where: { nome_usuario: login },
-    });
+      const user = await Usuario.findOne({
+        where: { nome_usuario: login },
+      });
 
-    if (!user) return res.status(401).json({ error: 'Usuário não existe' });
+      if (!user) throw new ErrorHandler(401, 'Usuário inexistente');
 
-    if (!user.checkPassword(senha))
-      return res.status(401).json({ error: 'Senha incorreta' });
+      if (!user.checkPassword(senha))
+        throw new ErrorHandler(401, 'Senha incorreta');
 
-    const { id, nome_usuario, nome_exibicao } = user;
+      const { id, nome_usuario, nome_exibicao } = user;
 
-    return res.json({
-      id,
-      nome_usuario,
-      nome_exibicao,
-      token: jwt.sign({ id }, authConfig.secret, {
-        expiresIn: authConfig.expiresIn,
-      }),
-    });
+      return res.json({
+        id,
+        nome_usuario,
+        nome_exibicao,
+        token: jwt.sign({ id }, authConfig.secret, {
+          expiresIn: authConfig.expiresIn,
+        }),
+      });
+    } catch (error) {
+      next(error);
+    }
   }
 }
 export default new SessionController();
