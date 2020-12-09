@@ -21,7 +21,7 @@ export default class Inscricao {
       ({
         nome,
         cpf,
-        certidaoNascimento,
+        certidaoNascimento: certidao_nascimento,
         pisPasep,
         workplace,
         income: renda,
@@ -30,7 +30,7 @@ export default class Inscricao {
       }) => ({
         nome,
         cpf: cpf ? cpf.replace(/\./gi, "").replace("-", "") : null,
-        certidaoNascimento,
+        certidao_nascimento,
         pisPasep,
         local_trabalho: workplace.name,
         horario_trabalho_inicio: workplace.start,
