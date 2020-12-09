@@ -41,7 +41,9 @@ class MatriculaController {
         where: { matricula_id: matricula.id },
       });
 
-      return res.status(200).json(inscricao);
+      return inscricao
+        ? res.status(200).json(inscricao)
+        : res.status(404).end();
     } catch (error) {
       next(error);
     }
