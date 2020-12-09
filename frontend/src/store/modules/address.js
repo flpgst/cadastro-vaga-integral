@@ -18,7 +18,7 @@ const module = {
   actions: {
     async getStates({ commit, state }) {
       if (!state.states) {
-        const { data: states } = await api.get("estado");
+        const states = await api.get("estado");
         commit("states", states);
       }
     }
