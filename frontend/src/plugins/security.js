@@ -15,5 +15,5 @@ export function isAuthenticated() {
 
 export function logout() {
   localStorage.clear();
-  window.location.reload();
+  window.location.assign("/");
 }
