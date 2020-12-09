@@ -5,7 +5,7 @@
     :counter="counter"
     :disabled="disabled"
     :rules="rules"
-    @click:append="onClickAppend"
+    @click:append="$emit(`click:append`)"
     @keydown="event => $emit('keydown', event)"
     :clearable="clearable"
     flat
@@ -70,11 +70,6 @@ export default {
       if (this.required) rules.push(v => !!v || "Este campo é obrigatório");
 
       return rules;
-    }
-  },
-  methods: {
-    onClickAppend() {
-      this.$emit("click:append");
     }
   }
 };
