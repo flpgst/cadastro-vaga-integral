@@ -104,7 +104,7 @@ export default {
     async getInscricao() {
       this.inscricao = await this.$http
         .get(`inscricao/${this.id}`)
-        .error(error => this.showMessage(error, "error"));
+        .catch(error => this.showMessage(error, "error"));
 
       if (!this.inscricao) return;
 
