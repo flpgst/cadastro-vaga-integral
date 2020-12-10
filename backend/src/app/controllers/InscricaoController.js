@@ -167,12 +167,10 @@ class InscricaoController {
   async getById(req, res) {
     const { id } = req.params;
 
-    const inscricao = await Inscricao.findOne(
-      { where: { id, ativo: true } },
-      {
-        include: { nested: true, all: true },
-      }
-    );
+    const inscricao = await Inscricao.findOne({
+      where: { id, ativo: true },
+      include: { nested: true, all: true },
+    });
 
     return inscricao ? res.json(inscricao) : res.end();
   }
