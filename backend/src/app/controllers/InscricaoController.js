@@ -138,7 +138,7 @@ class InscricaoController {
         },
       });
 
-      return res.json(inscricoes);
+      return res.status(200).json(inscricoes);
     } catch (error) {
       next(error);
     }
