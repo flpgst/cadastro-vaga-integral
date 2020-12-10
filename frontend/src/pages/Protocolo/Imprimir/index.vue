@@ -18,8 +18,13 @@
           pretendida.
         </v-col>
 
-        <v-col cols="12" class="my-5">
-          Unidade de ensino: {{ inscricao.matricula.unidadeEnsino.pessoa.nome }}
+        <v-col cols="12">
+          Aluno: {{ inscricao.matricula.pessoa.nome.toUpperCase() }}
+        </v-col>
+
+        <v-col cols="12">
+          Unidade de ensino:
+          {{ inscricao.matricula.unidadeEnsino.pessoa.nome.toUpperCase() }}
         </v-col>
 
         <v-col cols="6" class="my-5">
