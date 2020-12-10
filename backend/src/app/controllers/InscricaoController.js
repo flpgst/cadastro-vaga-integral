@@ -125,15 +125,23 @@ class InscricaoController {
     }
   }
 
-  async index(req, res) {
-    const inscricoes = await Inscricao.findAll({
-      include: {
-        all: true,
-        nested: true,
-      },
-    });
+  async index(req, res, next) {
+    try {
+      if (!req.superAdmin && !req.gestor)
+        throw new ErrorHandler(401, 'Não autorizado');
 
-    return res.json(inscricoes);
+      const inscricoes = await Inscricao.findAll({
+        where: { ativo: true },
+        include: {
+          all: true,
+          nested: true,
+        },
+      });
+
+      return res.json(inscricoes);
+    } catch (error) {
+      next(error);
+    }
   }
 
   async update(req, res, next) {

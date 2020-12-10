@@ -15,6 +15,7 @@ class Inscricao extends Model {
         deferido: Sequelize.BOOLEAN,
         matricula_id: Sequelize.INTEGER,
         protocolo: Sequelize.INTEGER,
+        ativo: Sequelize.BOOLEAN,
         pessoa_criacao: {
           type: Sequelize.INTEGER,
           field: 'pessoa_criacao_id',
@@ -34,6 +35,9 @@ class Inscricao extends Model {
       },
       {
         hooks: {
+          beforeFind: (inscricao) => {
+            console.log('inscricao :>> ', inscricao);
+          },
           afterSave: (inscricao) => {
             this.update(
               { protocolo: createProtocol(inscricao.id) },
