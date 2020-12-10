@@ -295,7 +295,7 @@
         <v-divider />
 
         <v-card-actions class="d-flex justify-end py-3">
-          <CPTBtn label="Não" @click="dialog = false" />
+          <CPTBtn label="Não" @click="dialog = saving = false" />
           <CPTBtn
             label="Sim"
             @click="criarInscricao(inscricao), (dialog = false)"
@@ -400,8 +400,6 @@ export default {
       this.$refs.form.resetValidation();
     },
     criarInscricao(inscricao) {
-      this.saving = true;
-
       this.$http
         .post("inscricao", inscricao)
         .then(inscricao => {
@@ -427,8 +425,17 @@ export default {
     getStates() {
       if (!this.states) this.$store.dispatch("address/getStates");
     },
-    getStudent(codigo) {
+    async getStudent(codigo) {
       this.loading = true;
+
+      if (await this.hasInscricao(codigo)) {
+        this.loading = false;
+        return this.showMessage(
+          "Já existe uma inscrição para essa matrícula",
+          "error"
+        );
+      }
+
       this.$http
         .get("matricula", { params: { codigo } })
         .then(student => {
@@ -450,6 +457,13 @@ export default {
 
       this.dialog = true;
     },
+    async hasInscricao(enrollment) {
+      const inscricao = await this.$http
+        .get(`matricula/${enrollment}/inscricao`)
+        .catch(error => this.showMessage(error, "error"));
+
+      return !!inscricao;
+    },
     onInputEnrollment() {
       this.student = null;
       this.mother?.clear();
@@ -458,17 +472,24 @@ export default {
       this.members = [];
     },
     onSubmit() {
-      if (!this.$refs.form.validate())
+      this.saving = true;
+      if (!this.$refs.form.validate()) {
+        this.saving = false;
+
         return this.showMessage(
           "Verifique as informações inseridas e tente novamente",
           "error"
         );
+      }
 
-      if (!this.family.length)
+      if (!this.family.length) {
+        this.saving = false;
+
         return this.showMessage(
           "O grupo familiar deve possuir ao menos um membro além do aluno",
           "error"
         );
+      }
 
       const family = this.family.map(member => ({
         ...member,
