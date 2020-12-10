@@ -61,28 +61,26 @@
         </v-col>
       </v-col>
     </template>
-    <v-fab-transition style="border: solid 1px black">
-      <v-tooltip top>
-        <template v-slot:activator="{ on }">
-          <v-btn
-            id="cvi-print-btn"
-            v-on="on"
-            class="mr-8 mb-8"
-            @click="print"
-            color="primary"
-            fab
-            large
-            dark
-            bottom
-            fixed
-            right
-          >
-            <v-icon>mdi-printer</v-icon>
-          </v-btn>
-        </template>
-        Imprimir Protocolo
-      </v-tooltip>
-    </v-fab-transition>
+    <v-tooltip top>
+      <template v-slot:activator="{ on }">
+        <v-btn
+          id="cvi-print-btn"
+          v-on="on"
+          class="mr-8 mb-8"
+          @click="print"
+          color="primary"
+          fab
+          large
+          dark
+          bottom
+          fixed
+          right
+        >
+          <v-icon>mdi-printer</v-icon>
+        </v-btn>
+      </template>
+      Imprimir Protocolo
+    </v-tooltip>
   </v-row>
 </template>
 
