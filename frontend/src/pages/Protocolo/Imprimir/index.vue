@@ -56,7 +56,7 @@
           </v-col>
 
           <v-col>
-            <v-divider />
+            <v-divider class="grey" />
           </v-col>
         </v-col>
       </v-col>
