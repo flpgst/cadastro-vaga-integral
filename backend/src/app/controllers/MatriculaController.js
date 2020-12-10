@@ -32,13 +32,13 @@ class MatriculaController {
       const { codigo } = req.params;
 
       const matricula = await Matricula.findOne({
-        where: { codigo },
+        where: { codigo, ativo: true },
       });
 
       if (!matricula) throw new ErrorHandler(400, 'Matrícula inexistente');
 
       const inscricao = await Inscricao.findOne({
-        where: { matricula_id: matricula.id },
+        where: { matricula_id: matricula.id, ativo: true },
       });
 
       return inscricao ? res.status(200).json(inscricao) : res.end();

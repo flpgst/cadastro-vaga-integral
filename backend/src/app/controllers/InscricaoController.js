@@ -32,7 +32,6 @@ class InscricaoController {
       ];
 
       if (endereco.find((campo) => campo !== inscricao.endereco[campo])) {
-        console.log('endereco :>> ', logradouro);
         await Endereco.update(
           {
             logradouro: inscricao.endereco.logradouro,
@@ -150,7 +149,9 @@ class InscricaoController {
       const { id } = req.params;
 
       try {
-        const inscricao = await Inscricao.findByPk(id);
+        const inscricao = await Inscricao.findByPk(id, {
+          where: { ativo: true },
+        });
         inscricao.deferido = deferido ?? inscricao.deferido;
         inscricao.posicao = posicao ?? inscricao.posicao;
         await inscricao.save();
@@ -166,9 +167,13 @@ class InscricaoController {
   async getById(req, res) {
     const { id } = req.params;
 
-    const inscricao = await Inscricao.findByPk(id, {
-      include: { nested: true, all: true },
-    });
+    const inscricao = await Inscricao.findByPk(
+      id,
+      { where: { ativo: true } },
+      {
+        include: { nested: true, all: true },
+      }
+    );
 
     return res.json(inscricao);
   }

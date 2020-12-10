@@ -5,13 +5,22 @@ export async function findInscricao(matricula) {
   const inscricao = await Inscricao.findOne({
     where: {
       matricula_id: matricula,
+      ativo: true,
     },
   });
   return inscricao;
 }
 export async function findMatriculaById(id) {
-  const matricula = await Matricula.findByPk(id, {
-    include: { all: true, nested: true },
-  });
+  const matricula = await Matricula.findByPk(
+    id,
+    {
+      include: { all: true, nested: true },
+    },
+    {
+      where: {
+        ativo: true,
+      },
+    }
+  );
   return matricula;
 }
