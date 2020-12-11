@@ -466,6 +466,7 @@ export default {
     },
     onInputEnrollment() {
       this.student = null;
+      this.transporteProprio = null;
       this.mother?.clear();
       this.father?.clear();
       this.newFamilyMember?.clear();
