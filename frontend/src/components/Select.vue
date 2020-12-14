@@ -22,7 +22,7 @@ export default {
       default: () => []
     },
     value: {
-      type: [Number, String, Object],
+      type: [Number, String, Object, Boolean],
       default: null
     }
   },
