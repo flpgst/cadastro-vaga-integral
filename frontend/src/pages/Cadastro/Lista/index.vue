@@ -4,24 +4,22 @@
 
     <v-col cols="12">
       <CPTInput
-        v-model="protocol"
-        v-maska="'###########'"
-        label="Protocolo"
-        counter="11"
+        v-model="search"
+        placeholder="Pesquise o protocolo da inscrição, nome ou matrícula do aluno"
+        counter
       />
     </v-col>
 
     <v-col cols="12">
       <v-data-table
         hide-default-footer
-        :search="protocol"
-        item-key="protocolo"
-        no-results-text="Nenhuma inscrição encontrada com esse protocolo"
+        :search="search"
+        no-results-text="Nenhuma inscrição encontrada"
         :headers="[
           { sortable: false, text: 'Posição' },
           { sortable: false, text: 'Protocolo', value: 'protocolo' },
-          { sortable: false, text: 'Matrícula' },
-          { sortable: false, text: 'Aluno' },
+          { sortable: false, text: 'Matrícula', value: 'matricula.codigo' },
+          { sortable: false, text: 'Aluno', value: 'matricula.pessoa.nome' },
           { sortable: false, text: 'Deferido' }
         ]"
         :items="inscricoes"
@@ -85,7 +83,7 @@ export default {
   },
 
   data: () => ({
-    protocol: null,
+    search: null,
     dialog: false,
     inscricaoVisualizando: null,
     inscricoes: []
