@@ -1,7 +1,7 @@
 import Endereco from '../models/Endereco';
 import Inscricao from '../models/Inscricao';
 import MembroFamilia from '../models/MembroFamilia';
-import { findInscricao, findMatriculaById } from '../util/finders';
+import { findMatriculaById } from '../util/finders';
 import { cpf } from 'cpf-cnpj-validator';
 import ErrorHandler from '../util/error';
 
@@ -58,7 +58,14 @@ class InscricaoController {
           'Você não tem permissão para cadastrar esta matrícula'
         );
 
-      if (await findInscricao(inscricao.matricula_id))
+      const hasInscricao = await Inscricao.findOne({
+        where: {
+          matricula_id: inscricao.matricula_id,
+          ativo: true,
+        },
+      });
+      console.log('hasInscricao :>> ', hasInscricao);
+      if (hasInscricao)
         throw new ErrorHandler(
           401,
           'Já existe uma inscrição para esta matrícula'
@@ -67,7 +74,6 @@ class InscricaoController {
       const invalidCPF = inscricao.membros.find(
         (membro) => membro.cpf && !cpf.isValid(membro.cpf)
       );
-
       const invalidCertidaoNascimento = inscricao.membros.find(
         (membro) =>
           membro.certidao_nascimento &&
@@ -117,7 +123,7 @@ class InscricaoController {
 
         return res.status(200).json(inscricaoCreated);
       } catch (error) {
-        return res.status(error.status).json({ message: error });
+        throw new ErrorHandler(500, error.message);
       }
     } catch (error) {
       next(error);
@@ -149,16 +155,33 @@ class InscricaoController {
       const { id } = req.params;
 
       try {
-        const inscricao = await Inscricao.findByPk(id, {
-          where: { ativo: true },
+        const inscricao = await Inscricao.findOne({
+          where: { id, ativo: true },
         });
         inscricao.deferido = deferido ?? inscricao.deferido;
         inscricao.posicao = posicao ?? inscricao.posicao;
+
         await inscricao.save();
         return res.json(inscricao);
       } catch (error) {
         throw new ErrorHandler(error.status, error.message);
       }
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async delete(req, res, next) {
+    try {
+      const { id } = req.params;
+
+      const inscricao = await Inscricao.findByPk(id);
+      console.log('inscricao :>> ', inscricao);
+      inscricao.ativo = false;
+      inscricao.pessoa_modificacao = req.pessoaId;
+
+      await inscricao.save();
+      return res.json({ message: 'Inscrição excluída' });
     } catch (error) {
       next(error);
     }

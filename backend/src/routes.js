@@ -19,6 +19,7 @@ routes.post('/inscricao', InscricaoController.store);
 routes.get('/inscricao', InscricaoController.index);
 routes.get('/inscricao/:id', InscricaoController.getById);
 routes.put('/inscricao/:id', InscricaoController.update);
+routes.delete('/inscricao/:id', InscricaoController.delete);
 routes.get('/matricula/', MatriculaController.index);
 routes.get('/matricula/:codigo/inscricao', MatriculaController.getInscricao);
 routes.get('/parentesco', ParentescoController.index);
