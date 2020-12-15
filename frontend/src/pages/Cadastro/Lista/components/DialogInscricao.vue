@@ -1,13 +1,25 @@
 <template>
   <v-dialog :value="true" width="750" persistent>
-    <v-card color="grey lighten-5">
-      <v-card-title
-        class="headline primary white--text d-flex flex-column align-start"
-      >
-        <span v-text="inscricao.matricula.pessoa.nome" />
-        <span v-text="inscricao.protocolo" />
-      </v-card-title>
+    <v-toolbar color="primary" dark class="cvi-dialog-toolbar">
+      <v-toolbar-title class="d-flex flex-column justify-center">
+        <span class="title">
+          {{ inscricao.matricula.pessoa.nome }}
+        </span>
 
+        <span class="caption">
+          {{ inscricao.protocolo }}
+        </span>
+      </v-toolbar-title>
+
+      <v-spacer></v-spacer>
+
+      <v-btn icon @click="$emit('close')">
+        <v-icon>
+          mdi-close
+        </v-icon>
+      </v-btn>
+    </v-toolbar>
+    <v-card color="grey lighten-5">
       <v-card-text class="pt-5">
         <v-row>
           <v-col cols="6" class="pa-0 d-flex">
@@ -198,19 +210,11 @@
           </v-col>
         </v-row>
       </v-card-text>
-
-      <v-divider />
-
-      <v-card-actions class="d-flex justify-end py-3">
-        <CPTBtn label="Cancelar" @click="$emit('close')" />
-        <CPTBtn label="Salvar" @click="onSaveInscricao()" />
-      </v-card-actions>
     </v-card>
   </v-dialog>
 </template>
 
 <script>
-import CPTBtn from "@/components/Btn";
 import CPTInput from "@/components/Input";
 import CPTSelect from "@/components/Select";
 import CPTFormSubtitle from "@/components/FormSubtitle";
@@ -220,7 +224,6 @@ import stringToCpf from "@/utils/stringToCpf";
 export default {
   name: "dialog-inscricao",
   components: {
-    CPTBtn,
     CPTInput,
     CPTSelect,
     CPTFormSubtitle
@@ -259,3 +262,13 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+.cvi-dialog-toolbar {
+  z-index: 1;
+  margin: 0;
+  top: 0;
+  position: sticky;
+  padding: 0;
+}
+</style>
