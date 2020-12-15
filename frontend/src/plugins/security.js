@@ -8,7 +8,12 @@ export function getAuthToken() {
 
 export function isAdmin() {
   const userRole = JSON.parse(localStorage.getItem("user")).role;
-  return userRole === ADMIN || userRole === GESTOR;
+  return userRole === ADMIN;
+}
+
+export function isGestor() {
+  const userRole = JSON.parse(localStorage.getItem("user")).role;
+  return userRole === GESTOR;
 }
 
 export function getUser() {
