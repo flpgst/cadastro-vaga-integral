@@ -25,7 +25,7 @@
       <CPTSelect
         v-model="documentType"
         label="Documento"
-        :items="['CPF', 'Certidão de Nascimento']"
+        :items="['Escolha uma opção*', 'CPF', 'Certidão de Nascimento']"
         @input="member.cpf = member.certidaoNascimento = null"
       />
     </v-col>
@@ -240,7 +240,7 @@ export default {
     this.documentType =
       (this.member.cpf && "CPF") ||
       (this.member.certidaoNascimento && "Certidão de Nascimento") ||
-      "CPF";
+      "Escolha uma opção*";
 
     this.getKinshipDegrees();
   },
