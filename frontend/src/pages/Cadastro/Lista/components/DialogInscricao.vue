@@ -1,5 +1,5 @@
 <template>
-  <v-dialog :value="true" width="750" persistent>
+  <v-dialog @click:outside="$emit('close')" :value="true" width="750">
     <v-toolbar color="primary" dark class="cvi-dialog-toolbar">
       <v-toolbar-title class="d-flex flex-column justify-center">
         <span class="title">
