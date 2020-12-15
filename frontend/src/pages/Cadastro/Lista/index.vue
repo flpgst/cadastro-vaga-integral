@@ -13,15 +13,10 @@
     <v-col cols="12">
       <v-data-table
         hide-default-footer
+        disable-sort
         :search="search"
         no-results-text="Nenhuma inscrição encontrada"
-        :headers="[
-          { sortable: false, text: 'Posição' },
-          { sortable: false, text: 'Protocolo', value: 'protocolo' },
-          { sortable: false, text: 'Matrícula', value: 'matricula.codigo' },
-          { sortable: false, text: 'Aluno', value: 'matricula.pessoa.nome' },
-          { sortable: false, text: 'Deferido' }
-        ]"
+        :headers="headers"
         :items="inscricoes"
       >
         <template v-slot:item="{ item: inscricao, index }">
@@ -52,6 +47,18 @@
                 :color="inscricao.deferido ? 'green' : 'red'"
               />
             </td>
+
+            <td
+              v-if="isAdmin()"
+              @click="showDialogExclusao(inscricao), $event.stopPropagation()"
+            >
+              <v-icon
+                color="red"
+                @click="showDialogExclusao(inscricao), $event.stopPropagation()"
+              >
+                mdi-delete
+              </v-icon>
+            </td>
           </tr>
         </template>
       </v-data-table>
@@ -63,17 +70,51 @@
       @save="onSaveInscricao"
       @close="dialog = false"
     />
+
+    <v-dialog v-if="inscricaoExcluir" v-model="dialogExclusao" width="750">
+      <v-card>
+        <v-card-title class="primary title white--text">
+          Excluir inscrição? Esta ação não poderá ser desfeita.
+        </v-card-title>
+
+        <v-card-text class="py-3">
+          <v-row>
+            <v-col cols="12">
+              Protocolo: {{ inscricaoExcluir.protocolo }}
+            </v-col>
+            <v-col cols="12">
+              Aluno:
+              {{ inscricaoExcluir.matricula.pessoa.nome }}
+            </v-col>
+          </v-row>
+        </v-card-text>
+
+        <v-divider />
+
+        <v-card-actions class="d-flex justify-end">
+          <CPTBtn
+            label="Não"
+            @click="(inscricaoExcluir = null), (dialogExclusao = false)"
+          />
+          <CPTBtn label="Sim" @click="excluirInscricao(inscricaoExcluir)" />
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-row>
 </template>
 
 <script>
+import CPTBtn from "@/components/Btn";
 import CPTInput from "@/components/Input";
 import DialogInscricao from "@/pages/Cadastro/Lista/components/DialogInscricao";
+
+import { isAdmin } from "@/plugins/security";
 
 export default {
   name: "lista-cadastros",
 
   components: {
+    CPTBtn,
     CPTInput,
     DialogInscricao
   },
@@ -85,16 +126,50 @@ export default {
   data: () => ({
     search: null,
     dialog: false,
+    dialogExclusao: true,
     inscricaoVisualizando: null,
+    inscricaoExcluir: null,
     inscricoes: []
   }),
 
+  computed: {
+    headers() {
+      const headers = [
+        { text: "Posição" },
+        { text: "Protocolo", value: "protocolo" },
+        { text: "Matrícula", value: "matricula.codigo" },
+        { text: "Aluno", value: "matricula.pessoa.nome" },
+        { text: "Deferido" }
+      ];
+
+      return this.isAdmin()
+        ? [...headers, { text: "Cancelar Inscrição" }]
+        : headers;
+    }
+  },
+
   methods: {
+    excluirInscricao({ id }) {
+      this.$http
+        .delete(`inscricao/${id}`)
+        .then(({ message }) => {
+          this.inscricoes = this.inscricoes.filter(
+            inscricao => inscricao.id !== id
+          );
+
+          this.dialogExclusao = false;
+          this.inscricaoExcluir = false;
+
+          this.showMessage(message, "success");
+        })
+        .catch(error => this.showMessage(error, "error"));
+    },
     async getInscricoes() {
       this.inscricoes = await this.$http
         .get("inscricao")
         .catch(error => this.showMessage(error, "error"));
     },
+    isAdmin,
     onClickInscricao(inscricao, index) {
       this.inscricaoOriginal = {
         inscricao,
@@ -118,6 +193,10 @@ export default {
       this.inscricoes.splice(index, 1, this.inscricaoVisualizando);
 
       this.dialog = false;
+    },
+    showDialogExclusao(inscricao) {
+      this.inscricaoExcluir = inscricao;
+      this.dialogExclusao = true;
     }
   }
 };
