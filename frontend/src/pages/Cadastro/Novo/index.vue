@@ -99,7 +99,11 @@
             <CPTInput v-model="student.endereco.rua" label="Rua*" required />
           </v-col>
           <v-col cols="2">
-            <CPTInput v-model="student.endereco.numero" label="Número" />
+            <CPTInput
+              v-model="student.endereco.numero"
+              v-maska="'#*'"
+              label="Número"
+            />
           </v-col>
           <v-col cols="4">
             <CPTInput

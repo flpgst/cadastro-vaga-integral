@@ -140,7 +140,11 @@
         <CPTInput v-model="member.endereco.rua" label="Rua*" required />
       </v-col>
       <v-col cols="2">
-        <CPTInput v-model="member.endereco.numero" label="Número" />
+        <CPTInput
+          v-model="member.endereco.numero"
+          v-maska="'#*'"
+          label="Número"
+        />
       </v-col>
       <v-col cols="4">
         <CPTInput v-model="member.endereco.bairro" label="Bairro*" required />
