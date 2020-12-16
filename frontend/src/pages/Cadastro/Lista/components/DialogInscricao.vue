@@ -78,12 +78,11 @@
           <v-col cols="6" class="pa-0">
             <CPTSelect
               v-model="inscricao.deferido"
-              label="Deferido"
+              label="Situação"
               :items="[
-                { value: true, label: 'Sim' },
-                { value: false, label: 'Não' }
+                { value: true, text: 'Deferido' },
+                { value: false, text: 'Indeferido' }
               ]"
-              item-text="label"
             />
           </v-col>
         </v-row>
