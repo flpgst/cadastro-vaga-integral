@@ -54,7 +54,7 @@
               </v-tooltip>
             </v-col>
 
-            <v-col cols="auto">
+            <v-col cols="auto" v-if="false">
               <v-tooltip top>
                 <template v-slot:activator="{ on }">
                   <v-icon
