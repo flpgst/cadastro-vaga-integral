@@ -162,7 +162,8 @@ class InscricaoController {
         inscricao.posicao = posicao ?? inscricao.posicao;
 
         await inscricao.save();
-        return res.json(inscricao);
+        const inscricoes = await Inscricao.findAll();
+        return res.json(inscricoes);
       } catch (error) {
         throw new ErrorHandler(error.status, error.message);
       }
@@ -181,6 +182,7 @@ class InscricaoController {
       inscricao.pessoa_modificacao = req.pessoaId;
 
       await inscricao.save();
+
       return res.json({ message: 'Inscrição excluída' });
     } catch (error) {
       next(error);
