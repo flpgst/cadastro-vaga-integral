@@ -2,13 +2,12 @@
   <v-dialog @click:outside="$emit('close')" :value="true" width="750">
     <v-toolbar color="primary" dark flat class="cvi-dialog-toolbar">
       <v-toolbar-title class="d-flex flex-column justify-center">
-        <span class="title">
-          {{ inscricao.matricula.pessoa.nome }}
-        </span>
+        <span class="title" v-text="inscricao.matricula.pessoa.nome" />
 
-        <span class="caption">
-          {{ inscricao.protocolo }}
-        </span>
+        <span
+          class="caption"
+          v-text="`Matrícula: ${inscricao.matricula.codigo}`"
+        />
       </v-toolbar-title>
 
       <v-spacer></v-spacer>
@@ -20,8 +19,14 @@
       </v-btn>
     </v-toolbar>
     <v-card color="grey lighten-5">
-      <v-card-text class="pt-5">
+      <v-card-text>
         <v-row>
+          <v-col
+            cols="12"
+            class="title py-5"
+            v-text="`Protocolo: ${inscricao.protocolo}`"
+          />
+
           <v-col cols="6" class="pa-0 d-flex">
             <v-col cols="auto" class="d-flex pa-0">
               <CPTInput
@@ -49,7 +54,7 @@
               </v-tooltip>
             </v-col>
 
-            <v-col cols="auto">
+            <v-col cols="auto" v-if="false">
               <v-tooltip top>
                 <template v-slot:activator="{ on }">
                   <v-icon
@@ -73,12 +78,12 @@
           <v-col cols="6" class="pa-0">
             <CPTSelect
               v-model="inscricao.deferido"
-              label="Deferido"
+              label="Situação"
               :items="[
-                { value: true, label: 'Sim' },
-                { value: false, label: 'Não' }
+                { value: true, text: 'Deferido' },
+                { value: false, text: 'Indeferido' }
               ]"
-              item-text="label"
+              @input="onSaveInscricao"
             />
           </v-col>
         </v-row>
@@ -254,6 +259,8 @@ export default {
   },
   methods: {
     onSaveInscricao() {
+      delete this.inscricao.posicao;
+
       this.inscricao.editing = false;
       this.inscricaoOriginal = { ...this.inscricao };
       this.$emit("save");
