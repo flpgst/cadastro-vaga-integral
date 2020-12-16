@@ -231,7 +231,15 @@ export default {
       this.dialog = true;
     },
     onSaveInscricao() {
-      this.dialog = false;
+      this.$http
+        .put(
+          `inscricao/${this.inscricaoVisualizando.id}`,
+          this.inscricaoVisualizando
+        )
+        .then(() => {
+          this.showMessage("Inscrição atualizada com sucesso", "success");
+        })
+        .catch(error => this.showMessage(error, "error"));
     },
     showDialogExclusao(inscricao) {
       this.inscricaoExcluir = inscricao;

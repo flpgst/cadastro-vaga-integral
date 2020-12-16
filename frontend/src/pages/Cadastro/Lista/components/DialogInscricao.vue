@@ -83,6 +83,7 @@
                 { value: true, text: 'Deferido' },
                 { value: false, text: 'Indeferido' }
               ]"
+              @input="onSaveInscricao"
             />
           </v-col>
         </v-row>
@@ -258,6 +259,8 @@ export default {
   },
   methods: {
     onSaveInscricao() {
+      delete this.inscricao.posicao;
+
       this.inscricao.editing = false;
       this.inscricaoOriginal = { ...this.inscricao };
       this.$emit("save");
