@@ -1,6 +1,7 @@
 import Endereco from '../models/Endereco';
 import Inscricao from '../models/Inscricao';
 import MembroFamilia from '../models/MembroFamilia';
+import Matricula from '../models/Matricula';
 import { findMatriculaById } from '../util/finders';
 import { cpf } from 'cpf-cnpj-validator';
 import ErrorHandler from '../util/error';
@@ -162,7 +163,11 @@ class InscricaoController {
         inscricao.posicao = posicao ?? inscricao.posicao;
 
         await inscricao.save();
-        const inscricoes = await Inscricao.findAll();
+        const inscricoes = await Inscricao.findAll({
+          include: {
+            model: Matricula,
+          },
+        });
         return res.json(inscricoes);
       } catch (error) {
         throw new ErrorHandler(error.status, error.message);
