@@ -2,19 +2,31 @@
   <v-row>
     <v-col cols="12" v-text="$route.name" class="grey--text text-h2" />
 
-    <v-col cols="12">
+    <v-col cols="4">
       <CPTInput
-        v-model="search"
-        placeholder="Pesquise o protocolo da inscrição, nome ou matrícula do aluno"
-        counter
+        v-model="protocolo"
+        v-maska="'###########'"
+        label="Protocolo"
+        counter="11"
       />
+    </v-col>
+    <v-col cols="4">
+      <CPTInput
+        v-model="matricula"
+        v-maska="'###########'"
+        label="Matrícula"
+        counter="11"
+      />
+    </v-col>
+
+    <v-col cols="4">
+      <CPTInput v-model="aluno" label="Aluno" />
     </v-col>
 
     <v-col cols="12">
       <v-data-table
         hide-default-footer
         disable-sort
-        :search="search"
         no-results-text="Nenhuma inscrição encontrada"
         :headers="headers"
         :items="inscricoes"
@@ -124,7 +136,10 @@ export default {
   },
 
   data: () => ({
-    search: null,
+    protocolo: "",
+    matricula: "",
+    aluno: "",
+
     dialog: false,
     dialogExclusao: true,
     inscricaoVisualizando: null,
@@ -136,9 +151,23 @@ export default {
     headers() {
       const headers = [
         { text: "Posição" },
-        { text: "Protocolo", value: "protocolo" },
-        { text: "Matrícula", value: "matricula.codigo" },
-        { text: "Aluno", value: "matricula.pessoa.nome" },
+        {
+          text: "Protocolo",
+          value: "protocolo",
+          filter: protocolo =>
+            !this.protocolo || protocolo.includes(this.protocolo)
+        },
+        {
+          text: "Matrícula",
+          value: "matricula.codigo",
+          filter: matricula =>
+            !this.matricula || matricula.includes(this.matricula)
+        },
+        {
+          text: "Aluno",
+          value: "matricula.pessoa.nome",
+          filter: aluno => !this.aluno || aluno.includes(this.aluno)
+        },
         { text: "Deferido" }
       ];
 
