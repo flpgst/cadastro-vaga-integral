@@ -25,20 +25,23 @@
 
     <v-col cols="12">
       <v-data-table
-        hide-default-footer
         disable-sort
+        :items-per-page="50"
         no-results-text="Nenhuma inscrição encontrada"
         :headers="headers"
         :items="inscricoes"
+        :footer-props="{
+          'items-per-page-options': [10, 25, 50]
+        }"
       >
-        <template v-slot:item="{ item: inscricao, index }">
+        <template v-slot:item="{ item: inscricao }">
           <tr
             class="cvi-table-row"
             :key="inscricao.id"
-            @click="onClickInscricao(inscricao, index + 1)"
+            @click="onClickInscricao(inscricao)"
           >
             <td>
-              {{ inscricao.posicao || index + 1 }}
+              {{ inscricao.posicao }}
             </td>
 
             <td>
@@ -121,6 +124,7 @@ import CPTInput from "@/components/Input";
 import DialogInscricao from "@/pages/Cadastro/Lista/components/DialogInscricao";
 
 import { isAdmin } from "@/plugins/security";
+import { first } from "lodash";
 
 export default {
   name: "lista-cadastros",
@@ -182,9 +186,16 @@ export default {
       this.$http
         .delete(`inscricao/${id}`)
         .then(({ message }) => {
-          this.inscricoes = this.inscricoes.filter(
+          const inscricoes = this.inscricoes.filter(
             inscricao => inscricao.id !== id
           );
+
+          this.inscricoes = first(inscricoes).posicao
+            ? inscricoes
+            : inscricoes.map((inscricao, index) => ({
+                ...inscricao,
+                posicao: index + 1
+              }));
 
           this.dialogExclusao = false;
           this.inscricaoExcluir = false;
@@ -193,34 +204,33 @@ export default {
         })
         .catch(error => this.showMessage(error, "error"));
     },
-    async getInscricoes() {
-      this.inscricoes = await this.$http
+    getInscricoes() {
+      this.$http
         .get("inscricao")
+        .then(inscricoes => {
+          this.inscricoes = first(inscricoes).posicao
+            ? inscricoes
+            : inscricoes.map((inscricao, index) => ({
+                ...inscricao,
+                posicao: index + 1
+              }));
+        })
         .catch(error => this.showMessage(error, "error"));
     },
     isAdmin,
-    onClickInscricao(inscricao, index) {
+    onClickInscricao(inscricao) {
       this.inscricaoOriginal = {
-        inscricao,
-        posicao: inscricao.posicao || index
+        ...inscricao
       };
 
       this.inscricaoVisualizando = {
         ...inscricao,
-        index,
-        editing: false,
-        posicao: inscricao.posicao || index
+        editing: false
       };
 
       this.dialog = true;
     },
     onSaveInscricao() {
-      const index = this.inscricoes.findIndex(
-        inscricao => inscricao.id === this.inscricaoVisualizando.id
-      );
-
-      this.inscricoes.splice(index, 1, this.inscricaoVisualizando);
-
       this.dialog = false;
     },
     showDialogExclusao(inscricao) {
