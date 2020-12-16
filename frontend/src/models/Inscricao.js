@@ -13,7 +13,8 @@ export default class Inscricao {
           ...endereco,
           logradouro: endereco.rua,
           cidade_id: endereco.cidade.id,
-          cep: endereco.cep.replace("-", "")
+          cep: endereco.cep.replace("-", ""),
+          numero: endereco.numero || endereco.numero !== "0" || null
         }
       : null;
 
