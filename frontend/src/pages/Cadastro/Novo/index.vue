@@ -1,5 +1,6 @@
 <template>
-  <v-row>
+  <PrazoEncerrado v-if="!processoInscricao" />
+  <v-row v-else>
     <v-col cols="12" v-text="$route.name" class="grey--text text-h2" />
     <v-col cols="12" class="px-0">
       <v-col cols="12">
@@ -317,6 +318,7 @@ import CPTAutocomplete from "@/components/Autocomplete";
 import CPTSubtitle from "@/components/FormSubtitle";
 import CPTBtn from "@/components/Btn";
 import CPTFormMemberFamily from "@/pages/Cadastro/components/FormMemberFamily";
+import PrazoEncerrado from "@/pages/Cadastro/PrazoEncerrado";
 
 import FamilyMember from "@/models/FamilyMember";
 import Student from "@/models/Student";
@@ -339,10 +341,13 @@ export default {
     CPTAutocomplete,
     CPTBtn,
     CPTSubtitle,
-    CPTFormMemberFamily
+    CPTFormMemberFamily,
+    PrazoEncerrado
   },
 
   mounted() {
+    this.getProcessoInscricao();
+
     this.getStates();
   },
 
@@ -360,6 +365,7 @@ export default {
     inscricao: null,
 
     student: null,
+    processoInscricao: null,
     state: null,
     cities: [],
     father: new FamilyMember(),
@@ -426,6 +432,15 @@ export default {
         .get(`cidade?estado_id=${this.state.id}`)
         .catch(error => this.showMessage(error, "error"));
     },
+    async getProcessoInscricao() {
+      this.loading = true;
+
+      this.processoInscricao = await this.$http
+        .get("processo-inscricao")
+        .catch(error => this.showMessage(error, "error"));
+
+      this.loading = false;
+    },
     getStates() {
       if (!this.states) this.$store.dispatch("address/getStates");
     },
@@ -463,8 +478,8 @@ export default {
     },
     async hasInscricao(enrollment) {
       const inscricao = await this.$http
-        .get(`matricula/${enrollment}/inscricao`)
-        .catch(error => this.showMessage(error, "error"));
+        .get(`matricula/${enrollment}/inscricao`, {})
+        .catch(() => this.showMessage("shazam", "error"));
 
       return !!inscricao;
     },
@@ -508,8 +523,11 @@ export default {
         family,
         this.transporteProprio,
         this.vulnerabilidadeSocial,
-        this.processoJudicial
+        this.processoJudicial,
+        this.processoInscricao
       );
+
+      console.log(inscricao);
 
       if (!this.rendaPerCapta())
         return this.handleRendaPerCaptaZerada(inscricao);

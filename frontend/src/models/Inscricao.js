@@ -5,7 +5,8 @@ export default class Inscricao {
     membros,
     transporte_proprio,
     vulnerabilidade_social,
-    processo_judicial
+    processo_judicial,
+    processo_inscricao
   ) {
     this.matricula_id = matricula_id;
     this.endereco = endereco
@@ -52,5 +53,6 @@ export default class Inscricao {
     this.transporte_proprio = transporte_proprio;
     this.vulnerabilidade_social = vulnerabilidade_social;
     this.processo_judicial = processo_judicial;
+    this.processo_inscricao_id = processo_inscricao.id;
   }
 }

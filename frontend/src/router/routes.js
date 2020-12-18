@@ -1,5 +1,3 @@
-import isPrazoEncerrado from "@/utils/isPrazoEncerrado";
-
 import NovoCadastro from "@/pages/Cadastro/Novo";
 
 const ListaCadastros = () =>
@@ -13,27 +11,11 @@ const ImprimirProtocolo = () =>
 const BuscarProtocolo = () =>
   import(/* webpackChunkName: "buscar-protocolo" */ "@/pages/Protocolo/Buscar");
 
-const PrazoEncerrado = () =>
-  import(
-    /* webpackChunkName: "buscar-protocolo" */ "@/pages/Cadastro/PrazoEncerrado"
-  );
-
 const routes = [
   {
     path: "/",
     name: "Novo Cadastro",
-    component: NovoCadastro,
-    beforeEnter: (to, from, next) => {
-      isPrazoEncerrado() ? next({ path: "/encerrado", replace: true }) : next();
-    }
-  },
-  {
-    path: "/encerrado",
-    name: "Prazo Encerrado",
-    component: PrazoEncerrado,
-    beforeEnter: (to, from, next) => {
-      isPrazoEncerrado() ? next() : next("/");
-    }
+    component: NovoCadastro
   },
   {
     path: "/cadastros",
@@ -48,8 +30,8 @@ const routes = [
   {
     path: "/protocolo/:id",
     name: "Impressão de Protocolo",
-    props: true,
-    component: ImprimirProtocolo
+    component: ImprimirProtocolo,
+    props: true
   }
 ];
 
