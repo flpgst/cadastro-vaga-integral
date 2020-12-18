@@ -124,15 +124,15 @@
               `${endereco.logradouro}, ${endereco.bairro}, ${endereco.numero ||
                 'S/N'} - ${endereco.cidade.nome}/${
                 endereco.cidade.estado.sigla
-              } ${endereco.complemento ? '(' + endereco.complemento + ')' : ''}`
+              }`
             "
             class="pb-0 text-uppercase"
           />
           <v-col
             v-if="endereco.complemento"
-            v-text="endereco.complemento"
+            v-text="`Complemento: ${endereco.complemento}`"
             cols="12"
-            class="pt-0 caption"
+            class="pt-0"
           />
 
           <v-col cols="12">
