@@ -164,9 +164,15 @@ class InscricaoController {
 
         await inscricao.save();
         const inscricoes = await Inscricao.findAll({
-          include: {
-            model: Matricula,
-          },
+          include: [
+            {
+              model: Matricula,
+            },
+            {
+              model: MembroFamilia,
+              include: { model: Endereco },
+            },
+          ],
         });
         return res.json(inscricoes);
       } catch (error) {
