@@ -23,13 +23,13 @@
       <CPTInput v-model="aluno" label="Aluno" />
     </v-col>
 
-    <v-col cols="12">
+    <v-col cols="12" v-if="handleInscricoes">
       <v-data-table
         disable-sort
         :items-per-page="50"
         no-results-text="Nenhuma inscrição encontrada"
         :headers="headers"
-        :items="inscricoes"
+        :items="handleInscricoes"
         :footer-props="{
           'items-per-page-options': [10, 25, 50]
         }"
@@ -152,6 +152,16 @@ export default {
   }),
 
   computed: {
+    handleInscricoes() {
+      if (!this.inscricoes.length) return [];
+
+      return first(this.inscricoes).posicao
+        ? this.inscricoes
+        : this.inscricoes.map((inscricao, index) => ({
+            ...inscricao,
+            posicao: index + 1
+          }));
+    },
     headers() {
       const headers = [
         { text: "Posição" },
@@ -186,16 +196,9 @@ export default {
       this.$http
         .delete(`inscricao/${id}`)
         .then(({ message }) => {
-          const inscricoes = this.inscricoes.filter(
+          this.inscricoes = this.inscricoes.filter(
             inscricao => inscricao.id !== id
           );
-
-          this.inscricoes = first(inscricoes).posicao
-            ? inscricoes
-            : inscricoes.map((inscricao, index) => ({
-                ...inscricao,
-                posicao: index + 1
-              }));
 
           this.dialogExclusao = false;
           this.inscricaoExcluir = false;
@@ -208,12 +211,7 @@ export default {
       this.$http
         .get("inscricao")
         .then(inscricoes => {
-          this.inscricoes = first(inscricoes).posicao
-            ? inscricoes
-            : inscricoes.map((inscricao, index) => ({
-                ...inscricao,
-                posicao: index + 1
-              }));
+          this.inscricoes = inscricoes;
         })
         .catch(error => this.showMessage(error, "error"));
     },
@@ -236,7 +234,12 @@ export default {
           `inscricao/${this.inscricaoVisualizando.id}`,
           this.inscricaoVisualizando
         )
-        .then(() => {
+        .then(inscricoes => {
+          this.inscricoes = inscricoes;
+
+          this.inscricaoVisualizando = this.handleInscricoes.find(
+            inscricao => inscricao.id === this.inscricaoVisualizando.id
+          );
           this.showMessage("Inscrição atualizada com sucesso", "success");
         })
         .catch(error => this.showMessage(error, "error"));
