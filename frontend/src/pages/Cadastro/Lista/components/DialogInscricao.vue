@@ -79,6 +79,7 @@
             <CPTSelect
               v-model="inscricao.deferido"
               label="Situação"
+              disabled
               :items="[
                 { value: true, text: 'Deferido' },
                 { value: false, text: 'Indeferido' }
