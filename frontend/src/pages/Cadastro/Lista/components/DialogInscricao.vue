@@ -193,20 +193,19 @@
                     </v-col>
                   </v-row>
 
-                  <v-row v-if="membro.endereco.id === endereco.id">
-                    <v-col>
+                  <v-row v-if="membro.endereco.id !== endereco.id">
+                    <v-col cols="12">
                       Endereço:
                       {{
                         `${endereco.logradouro}, ${
                           endereco.bairro
                         }, ${endereco.numero || "S/N"} - ${
                           endereco.cidade.nome
-                        }/${endereco.cidade.estado.sigla} ${
-                          endereco.complemento
-                            ? "(" + endereco.complemento + ")"
-                            : ""
-                        }`
+                        }/${endereco.cidade.estado.sigla} `
                       }}
+                    </v-col>
+                    <v-col v-if="membro.endereco.complemento" cols="12">
+                      Complemento: {{ membro.endereco.complemento }}
                     </v-col>
                   </v-row>
                 </td>
