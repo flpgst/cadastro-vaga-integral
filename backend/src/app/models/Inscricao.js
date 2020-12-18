@@ -35,9 +35,6 @@ class Inscricao extends Model {
       },
       {
         hooks: {
-          beforeFind: (inscricao) => {
-            console.log('inscricao :>> ', inscricao);
-          },
           afterSave: (inscricao) => {
             this.update(
               { protocolo: createProtocol(inscricao.id) },
@@ -61,6 +58,9 @@ class Inscricao extends Model {
     });
     this.hasMany(models.membroFamilia, {
       foreignKey: 'inscricao_id',
+    });
+    this.belongsTo(models.processoInscricao, {
+      foreignKey: 'processo_inscricao_id',
     });
   }
 }

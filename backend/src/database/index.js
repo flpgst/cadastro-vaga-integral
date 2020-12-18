@@ -14,6 +14,7 @@ import Estado from '../app/models/Estado';
 import Pais from '../app/models/Pais';
 import MembroFamilia from '../app/models/MembroFamilia';
 import Parentesco from '../app/models/Parentesco';
+import ProcessoInscricao from '../app/models/ProcessoInscricao';
 
 const models = [
   Atribuicao,
@@ -29,6 +30,7 @@ const models = [
   Pais,
   MembroFamilia,
   Parentesco,
+  ProcessoInscricao,
 ];
 
 class Database {

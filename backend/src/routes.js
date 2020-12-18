@@ -8,6 +8,7 @@ import MatriculaController from './app/controllers/MatriculaController';
 import ParentescoController from './app/controllers/ParentescoController';
 import CidadeController from './app/controllers/CidadeController';
 import EstadoController from './app/controllers/EstadoController';
+import ProcessoInscricaoController from './app/controllers/ProcessoInscricaoController';
 
 const routes = new Router();
 
@@ -25,5 +26,6 @@ routes.get('/matricula/:codigo/inscricao', MatriculaController.getInscricao);
 routes.get('/parentesco', ParentescoController.index);
 routes.get('/cidade', CidadeController.index);
 routes.get('/estado', EstadoController.index);
+routes.get('/processo-inscricao', ProcessoInscricaoController.index);
 
 export default routes;
