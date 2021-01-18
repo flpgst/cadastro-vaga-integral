@@ -36,7 +36,8 @@ export default async (req, res, next) => {
     if (
       user.atribuicoes[0].dataValues.grupo.dataValues.nome !==
         'Super Administrador' &&
-      user.atribuicoes[0].dataValues.grupo.dataValues.nome !== 'Secretário'
+      user.atribuicoes[0].dataValues.grupo.dataValues.nome !== 'Secretário' &&
+      user.atribuicoes[0].dataValues.grupo.dataValues.nome !== 'Gestor'
     ) {
       return res.status(401).json({ message: 'Não Autorizado' });
     }

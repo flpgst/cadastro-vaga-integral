@@ -9,6 +9,7 @@ import ParentescoController from './app/controllers/ParentescoController';
 import CidadeController from './app/controllers/CidadeController';
 import EstadoController from './app/controllers/EstadoController';
 import ProcessoInscricaoController from './app/controllers/ProcessoInscricaoController';
+import OrdenaInscricaoController from './app/controllers/OrdenaInscricaoController';
 
 const routes = new Router();
 
@@ -27,5 +28,6 @@ routes.get('/parentesco', ParentescoController.index);
 routes.get('/cidade', CidadeController.index);
 routes.get('/estado', EstadoController.index);
 routes.get('/processo-inscricao', ProcessoInscricaoController.index);
+routes.put('/ordenar-inscricoes', OrdenaInscricaoController.update);
 
 export default routes;

@@ -142,6 +142,7 @@ class InscricaoController {
           all: true,
           nested: true,
         },
+        order: [['posicao', 'ASC']],
       });
 
       return res.status(200).json(inscricoes);
