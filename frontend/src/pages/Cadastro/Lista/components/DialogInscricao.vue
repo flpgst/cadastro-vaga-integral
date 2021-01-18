@@ -87,6 +87,10 @@
               @input="onSaveInscricao"
             />
           </v-col>
+
+          <v-col cols="12">
+            Renda per capta: R$ {{ inscricao.renda_percapta }}
+          </v-col>
         </v-row>
 
         <v-row>
