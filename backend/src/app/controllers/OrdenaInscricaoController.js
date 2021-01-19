@@ -5,6 +5,10 @@ import Matricula from '../models/Matricula';
 import Pessoa from '../models/Pessoa';
 import ProcessoInscricao from '../models/ProcessoInscricao';
 import UnidadeEnsino from '../models/UnidadeEnsino';
+import MembroFamilia from '../models/MembroFamilia';
+import Endereco from '../models/Endereco';
+import Cidade from '../models/Cidade';
+import Parentesco from '../models/Parentesco';
 
 class OrdenarInscricaoController {
   async update(req, res, next) {
@@ -20,6 +24,16 @@ class OrdenarInscricaoController {
           },
           include: [
             ProcessoInscricao,
+            {
+              model: MembroFamilia,
+              include: [
+                {
+                  model: Endereco,
+                  include: { model: Cidade, nested: true, all: true },
+                },
+                Parentesco,
+              ],
+            },
             {
               model: Matricula,
               include: [
