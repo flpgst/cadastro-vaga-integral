@@ -57,20 +57,19 @@ function alteraPosicao(inscricoes, inscricaoId, posicao) {
     Math.max(indexPosicao, indexInscricao) + 1
   );
 
-  // return inscricoes;
-  let novaPosicao =
+  let inscricao =
     inscricoes[0].id === Number(inscricaoId)
       ? inscricoes.shift()
       : inscricoes.pop();
-  novaPosicao = { ...novaPosicao.dataValues, posicao };
-  // return inscricoes;
 
   inscricoes = inscricoes.map(({ dataValues }) => ({
     ...dataValues,
-    posicao: Number(dataValues.posicao) + 1,
+    posicao:
+      Number(dataValues.posicao) + (inscricao.posicao < posicao ? -1 : 1),
   }));
 
-  inscricoes.push(novaPosicao);
+  inscricao = { ...inscricao.dataValues, posicao };
+  inscricoes.push(inscricao);
   return inscricoes;
 }
 
