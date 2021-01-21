@@ -87,10 +87,6 @@
               @input="onSaveInscricao"
             />
           </v-col>
-
-          <v-col cols="12">
-            Renda per capta: R$ {{ inscricao.renda_percapta }}
-          </v-col>
         </v-row>
 
         <v-row>
@@ -100,23 +96,23 @@
 
           <v-col cols="6">
             Criança em vulnerabilidade social:
-            {{ inscricao.vulnerabilidade ? "Sim" : "Não" }}
+            {{ inscricao.vulnerabilidade_social ? "Sim" : "Não" }}
           </v-col>
 
-          <v-col cols="6" class="pa-0">
-            <v-col cols="12" :class="inscricao.processo_judicial && 'py-0'">
-              Cadastro no Fila Única com processo judicial:
-              {{ inscricao.processo_judicial ? "Sim" : "Não" }}
-            </v-col>
-            <v-col v-if="inscricao.processo_judicial" class="py-0" cols="12">
-              Número do processo:
-              {{ inscricao.processo_judicial }}
-            </v-col>
+          <v-col v-if="inscricao.processo_judicial" cols="6">
+            Número do processo judicial:
+            {{ inscricao.processo_judicial }}
           </v-col>
 
-          <v-col cols="12">
-            Família possio meio de transporte próprio:
-            {{ inscricao.transporte_proprio }}
+          <v-col cols="6">
+            Meio de transporte próprio:
+            <span>
+              {{ inscricao.transporte_proprio.replace("_", " ") }}
+            </span>
+          </v-col>
+
+          <v-col cols="6">
+            Renda per capta: R$ {{ inscricao.renda_percapta }}
           </v-col>
 
           <v-col cols="12">
@@ -186,20 +182,28 @@
                       {{ membro.local_trabalho || "Não informado" }}
                     </v-col>
 
-                    <v-col v-if="membro.local_trabalho" class="pa-0">
-                      <v-col cols="12" class="py-0">
+                    <v-col
+                      v-if="membro.local_trabalho"
+                      cols="auto"
+                      class="py-0"
+                    >
+                      <v-col cols="auto" class="pb-0 text-end">
                         Horário de entrada:
                         {{ membro.horario_trabalho_inicio || "Não informado" }}
                       </v-col>
-                      <v-col cols="12" class="py-0">
+                      <v-col cols="auto" class="pt-0 text-end">
                         Horário de saída:
                         {{ membro.horario_trabalho_fim || "Não informado" }}
                       </v-col>
                     </v-col>
+
+                    <v-col cols="12">
+                      Renda mensal: R$ {{ membro.renda }}
+                    </v-col>
                   </v-row>
 
                   <v-row v-if="membro.endereco.id !== endereco.id">
-                    <v-col cols="12">
+                    <v-col cols="12" class="pb-0">
                       Endereço:
                       {{
                         `${endereco.logradouro}, ${
@@ -209,7 +213,11 @@
                         }/${endereco.cidade.estado.sigla} `
                       }}
                     </v-col>
-                    <v-col v-if="membro.endereco.complemento" cols="12">
+                    <v-col
+                      v-if="membro.endereco.complemento"
+                      cols="12"
+                      class="pt-0"
+                    >
                       Complemento: {{ membro.endereco.complemento }}
                     </v-col>
                   </v-row>
@@ -263,8 +271,6 @@ export default {
   },
   methods: {
     onSaveInscricao() {
-      delete this.inscricao.posicao;
-
       this.inscricao.editing = false;
       this.inscricaoOriginal = { ...this.inscricao };
       this.$emit("save");

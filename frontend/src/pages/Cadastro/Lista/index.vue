@@ -1,7 +1,25 @@
 <template>
   <v-row>
-    <v-col cols="12" v-text="$route.name" class="grey--text text-h2" />
-
+    <v-col cols="10" v-text="$route.name" class="grey--text text-h2" />
+    <v-col cols="2" class="text-end">
+      <v-tooltip v-if="isAdmin()">
+        <template v-slot:activator="{ on }">
+          <v-btn
+            fab
+            depressed
+            small
+            v-on="on"
+            color="primary"
+            @click="ordenarInscricoes"
+          >
+            <v-icon>
+              mdi-sort-numeric-ascending
+            </v-icon>
+          </v-btn>
+        </template>
+        Ordenar Inscrições
+      </v-tooltip>
+    </v-col>
     <v-col cols="4">
       <CPTInput
         v-model="protocolo"
@@ -23,7 +41,11 @@
       <CPTInput v-model="aluno" label="Aluno" />
     </v-col>
 
-    <v-col cols="12" v-if="handleInscricoes">
+    <v-col v-if="!handleInscricoes.length" cols="12">
+      <v-skeleton-loader type="list-item@15" />
+    </v-col>
+
+    <v-col cols="12" v-else>
       <v-data-table
         disable-sort
         :items-per-page="50"
@@ -41,7 +63,9 @@
             @click="onClickInscricao(inscricao)"
           >
             <td>
-              {{ inscricao.posicao }}
+              <span class="d-flex align-center justify-center">
+                {{ inscricao.posicao }}
+              </span>
             </td>
 
             <td>
@@ -56,7 +80,21 @@
               {{ inscricao.matricula.pessoa.nome }}
             </td>
 
-            <td class="d-flex align-center justify-start">
+            <td>
+              <span
+                class="ma-0 d-flex justify-center"
+                v-text="inscricao.vulnerabilidade_social ? 'SIM' : 'NÃO'"
+              />
+            </td>
+
+            <td>
+              <span
+                class="ma-0 d-flex justify-center"
+                v-text="inscricao.processo_judicial ? 'SIM' : 'NÃO'"
+              />
+            </td>
+
+            <td class="d-flex align-center justify-center">
               <v-icon
                 v-text="inscricao.deferido ? 'mdi-check' : 'mdi-close'"
                 :color="inscricao.deferido ? 'green' : 'red'"
@@ -67,12 +105,16 @@
               v-if="isAdmin()"
               @click="showDialogExclusao(inscricao), $event.stopPropagation()"
             >
-              <v-icon
-                color="red"
-                @click="showDialogExclusao(inscricao), $event.stopPropagation()"
-              >
-                mdi-delete
-              </v-icon>
+              <span class="d-flex align-center justify-center">
+                <v-icon
+                  color="red"
+                  @click="
+                    showDialogExclusao(inscricao), $event.stopPropagation()
+                  "
+                >
+                  mdi-delete
+                </v-icon>
+              </span>
             </td>
           </tr>
         </template>
@@ -182,6 +224,8 @@ export default {
           value: "matricula.pessoa.nome",
           filter: aluno => !this.aluno || aluno.includes(this.aluno)
         },
+        { text: "Vulnerabilidade Social" },
+        { text: "Processo Judicial" },
         { text: "Deferido" }
       ];
 
@@ -192,6 +236,16 @@ export default {
   },
 
   methods: {
+    ordenarInscricoes() {
+      this.inscricoes = [];
+      this.$http
+        .put("ordenar-inscricoes")
+        .then(inscricoes => {
+          this.showMessage("Inscrições ordenadas com sucesso", "success");
+          this.inscricoes = inscricoes;
+        })
+        .catch(error => this.showMessage(error, "error"));
+    },
     excluirInscricao({ id }) {
       this.$http
         .delete(`inscricao/${id}`)
@@ -229,11 +283,9 @@ export default {
       this.dialog = true;
     },
     onSaveInscricao() {
+      const { id, deferido } = this.inscricaoVisualizando;
       this.$http
-        .put(
-          `inscricao/${this.inscricaoVisualizando.id}`,
-          this.inscricaoVisualizando
-        )
+        .put(`inscricao/${this.inscricaoVisualizando.id}`, { id, deferido })
         .then(inscricoes => {
           this.inscricoes = inscricoes;
 
