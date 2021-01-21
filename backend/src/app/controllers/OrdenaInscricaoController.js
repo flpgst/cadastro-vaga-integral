@@ -45,9 +45,7 @@ class OrdenarInscricaoController {
           order: ['posicao', 'id'],
         });
 
-      let inscricoes = await getInscricoes().catch((error) =>
-        console.log('error >> ', error)
-      );
+      let inscricoes = await getInscricoes();
 
       let inscricoesOrdenadas = ordenaInscricoes(
         inscricoes.map(({ dataValues }) => dataValues)
@@ -67,6 +65,9 @@ class OrdenarInscricaoController {
     try {
       const { posicao } = req.body;
       const { id } = req.params;
+
+      if (!req.superAdmin && !req.gestor)
+        throw new ErrorHandler(401, 'Não autorizado');
 
       const getInscricoes = async () =>
         await Inscricao.findAll({

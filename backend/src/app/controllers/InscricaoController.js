@@ -17,6 +17,8 @@ class InscricaoController {
       const inscricao = req.body;
       const matricula = await findMatriculaById(inscricao.matricula_id);
 
+      if (!req.superAdmin) throw new ErrorHandler(401, 'Não autorizado');
+
       const {
         logradouro,
         numero,
@@ -161,6 +163,9 @@ class InscricaoController {
       const { deferido } = req.body;
       const { id } = req.params;
 
+      if (!req.superAdmin && !req.gestor)
+        throw new ErrorHandler(401, 'Não autorizado');
+
       try {
         const inscricao = await Inscricao.findOne({
           where: { id, ativo: true },
@@ -211,8 +216,9 @@ class InscricaoController {
     try {
       const { id } = req.params;
 
+      if (!req.superAdmin) throw new ErrorHandler(401, 'Não autorizado');
+
       const inscricao = await Inscricao.findByPk(id);
-      console.log('inscricao :>> ', inscricao);
       inscricao.ativo = false;
       inscricao.pessoa_modificacao = req.pessoaId;
 
