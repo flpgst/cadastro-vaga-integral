@@ -1,10 +1,15 @@
+import Cidade from '../models/Cidade';
 import Endereco from '../models/Endereco';
-import Inscricao from '../models/Inscricao';
-import MembroFamilia from '../models/MembroFamilia';
-import Matricula from '../models/Matricula';
-import { findMatriculaById } from '../util/finders';
-import { cpf } from 'cpf-cnpj-validator';
 import ErrorHandler from '../util/error';
+import Inscricao from '../models/Inscricao';
+import Matricula from '../models/Matricula';
+import MembroFamilia from '../models/MembroFamilia';
+import Parentesco from '../models/Parentesco';
+import Pessoa from '../models/Pessoa';
+import ProcessoInscricao from '../models/ProcessoInscricao';
+import UnidadeEnsino from '../models/UnidadeEnsino';
+import { cpf } from 'cpf-cnpj-validator';
+import { findMatriculaById } from '../util/finders';
 
 class InscricaoController {
   async store(req, res, next) {
@@ -153,7 +158,7 @@ class InscricaoController {
 
   async update(req, res, next) {
     try {
-      const { deferido, posicao } = req.body;
+      const { deferido } = req.body;
       const { id } = req.params;
 
       try {
@@ -164,19 +169,34 @@ class InscricaoController {
           return res.status(404).json({ message: 'Inscricão não encontrada' });
         }
         inscricao.deferido = deferido ?? inscricao.deferido;
-        inscricao.posicao = posicao ?? inscricao.posicao;
 
         await inscricao.save();
+
         const inscricoes = await Inscricao.findAll({
+          where: {
+            ativo: true,
+          },
           include: [
-            {
-              model: Matricula,
-            },
+            ProcessoInscricao,
             {
               model: MembroFamilia,
-              include: { model: Endereco },
+              include: [
+                {
+                  model: Endereco,
+                  include: { model: Cidade, nested: true, all: true },
+                },
+                Parentesco,
+              ],
+            },
+            {
+              model: Matricula,
+              include: [
+                { model: Pessoa, nested: true, all: true },
+                { model: UnidadeEnsino, include: Pessoa },
+              ],
             },
           ],
+          order: ['posicao', 'id'],
         });
         return res.json(inscricoes);
       } catch (error) {
