@@ -160,6 +160,9 @@ class InscricaoController {
         const inscricao = await Inscricao.findOne({
           where: { id, ativo: true },
         });
+        if (!inscricao) {
+          return res.status(404).json({ message: 'Inscricão não encontrada' });
+        }
         inscricao.deferido = deferido ?? inscricao.deferido;
         inscricao.posicao = posicao ?? inscricao.posicao;
 
