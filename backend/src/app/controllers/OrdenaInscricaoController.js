@@ -71,8 +71,30 @@ class OrdenarInscricaoController {
 
       const getInscricoes = async () =>
         await Inscricao.findAll({
-          where: { ativo: true },
-          order: ['posicao'],
+          where: {
+            ativo: true,
+          },
+          include: [
+            ProcessoInscricao,
+            {
+              model: MembroFamilia,
+              include: [
+                {
+                  model: Endereco,
+                  include: { model: Cidade, nested: true, all: true },
+                },
+                Parentesco,
+              ],
+            },
+            {
+              model: Matricula,
+              include: [
+                { model: Pessoa, nested: true, all: true },
+                { model: UnidadeEnsino, include: Pessoa },
+              ],
+            },
+          ],
+          order: ['posicao', 'id'],
         });
 
       const inscricoes = alteraPosicao(await getInscricoes(), id, posicao);
