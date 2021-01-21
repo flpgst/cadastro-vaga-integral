@@ -1,6 +1,6 @@
 import Inscricao from '../models/Inscricao';
 import ErrorHandler from '../util/error';
-import ordernaInscricoes from '../util/order';
+import { ordenaInscricoes, alteraPosicao } from '../util/order';
 import Matricula from '../models/Matricula';
 import Pessoa from '../models/Pessoa';
 import ProcessoInscricao from '../models/ProcessoInscricao';
@@ -42,20 +42,45 @@ class OrdenarInscricaoController {
               ],
             },
           ],
-          order: ['posicao'],
+          order: ['posicao', 'id'],
         });
 
-      let inscricoes = await getInscricoes();
+      let inscricoes = await getInscricoes().catch((error) =>
+        console.log('error >> ', error)
+      );
 
-      let inscricoesOrdenadas = ordernaInscricoes(
+      let inscricoesOrdenadas = ordenaInscricoes(
         inscricoes.map(({ dataValues }) => dataValues)
       );
 
-      inscricoesOrdenadas.map(async ({ id }, index) => {
-        await Inscricao.update({ posicao: index + 1 }, { where: id });
-      });
+      for await (let [index, { id }] of inscricoesOrdenadas.entries()) {
+        await Inscricao.update({ posicao: index + 1 }, { where: { id } });
+      }
 
       res.json(await getInscricoes());
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async reordenar(req, res, next) {
+    try {
+      const { posicao } = req.body;
+      const { id } = req.params;
+
+      const getInscricoes = async () =>
+        await Inscricao.findAll({
+          where: { ativo: true },
+          order: ['posicao'],
+        });
+
+      const inscricoes = alteraPosicao(await getInscricoes(), id, posicao);
+
+      for await (const { posicao, id } of inscricoes) {
+        await Inscricao.update({ posicao }, { where: { id } });
+      }
+
+      return res.json(await getInscricoes());
     } catch (error) {
       next(error);
     }

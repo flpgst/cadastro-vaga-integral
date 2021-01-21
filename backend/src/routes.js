@@ -29,5 +29,6 @@ routes.get('/cidade', CidadeController.index);
 routes.get('/estado', EstadoController.index);
 routes.get('/processo-inscricao', ProcessoInscricaoController.index);
 routes.put('/ordenar-inscricoes', OrdenaInscricaoController.update);
+routes.put('/alterar-posicao/:id', OrdenaInscricaoController.reordenar);
 
 export default routes;
