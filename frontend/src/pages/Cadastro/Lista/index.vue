@@ -1,13 +1,18 @@
 <template>
   <v-row>
-    <v-col cols="10" v-text="$route.name" class="grey--text text-h2" />
-    <v-col cols="2" class="text-end">
-      <v-tooltip v-if="isAdmin()">
+    <v-col
+      :cols="isAdmin() ? 10 : 12"
+      v-text="$route.name"
+      class="grey--text text-h2"
+    />
+    <v-col v-if="isAdmin()" cols="2" class="text-end">
+      <v-tooltip>
         <template v-slot:activator="{ on }">
           <v-btn
             fab
             depressed
             small
+            :loading="atualizandoInscricoes"
             v-on="on"
             color="primary"
             @click="ordenarInscricoes"
@@ -41,7 +46,7 @@
       <CPTInput v-model="aluno" label="Aluno" />
     </v-col>
 
-    <v-col v-if="!handleInscricoes.length" cols="12">
+    <v-col v-if="!inscricoes.length || !showList" cols="12">
       <v-skeleton-loader type="list-item@15" />
     </v-col>
 
@@ -51,7 +56,7 @@
         :items-per-page="50"
         no-results-text="Nenhuma inscrição encontrada"
         :headers="headers"
-        :items="handleInscricoes"
+        :items="inscricoes"
         :footer-props="{
           'items-per-page-options': [10, 25, 50]
         }"
@@ -124,7 +129,12 @@
     <DialogInscricao
       v-if="dialog"
       v-model="inscricaoVisualizando"
-      @save="onSaveInscricao"
+      @save="
+        parametro =>
+          parametro === 'posicao'
+            ? alterarPosicao()
+            : alterarSituacaoInscricao()
+      "
       @close="dialog = false"
     />
 
@@ -166,7 +176,6 @@ import CPTInput from "@/components/Input";
 import DialogInscricao from "@/pages/Cadastro/Lista/components/DialogInscricao";
 
 import { isAdmin } from "@/plugins/security";
-import { first } from "lodash";
 
 export default {
   name: "lista-cadastros",
@@ -190,20 +199,12 @@ export default {
     dialogExclusao: true,
     inscricaoVisualizando: null,
     inscricaoExcluir: null,
-    inscricoes: []
+    inscricoes: [],
+    atualizandoInscricoes: false,
+    showList: true
   }),
 
   computed: {
-    handleInscricoes() {
-      if (!this.inscricoes.length) return [];
-
-      return first(this.inscricoes).posicao
-        ? this.inscricoes
-        : this.inscricoes.map((inscricao, index) => ({
-            ...inscricao,
-            posicao: index + 1
-          }));
-    },
     headers() {
       const headers = [
         { text: "Posição" },
@@ -236,17 +237,27 @@ export default {
   },
 
   methods: {
-    ordenarInscricoes() {
-      this.inscricoes = [];
+    alterarSituacaoInscricao() {
+      const { id, deferido } = this.inscricaoVisualizando;
+
+      this.showList = false;
+
       this.$http
-        .put("ordenar-inscricoes")
+        .put(`/inscricao/${id}`, { deferido })
         .then(inscricoes => {
-          this.showMessage("Inscrições ordenadas com sucesso", "success");
           this.inscricoes = inscricoes;
+          this.showMessage("Inscrição atualizada com sucesso", "success");
+          this.dialog = false;
+          this.showList = true;
         })
-        .catch(error => this.showMessage(error, "error"));
+        .catch(error => {
+          this.showMessage(error, "error");
+          this.dialog = false;
+          this.showList = true;
+        });
     },
     excluirInscricao({ id }) {
+      this.showList = false;
       this.$http
         .delete(`inscricao/${id}`)
         .then(({ message }) => {
@@ -254,12 +265,16 @@ export default {
             inscricao => inscricao.id !== id
           );
 
+          this.showList = true;
           this.dialogExclusao = false;
           this.inscricaoExcluir = false;
 
           this.showMessage(message, "success");
         })
-        .catch(error => this.showMessage(error, "error"));
+        .catch(error => {
+          this.showMessage(error, "error");
+          this.showList = true;
+        });
     },
     getInscricoes() {
       this.$http
@@ -282,19 +297,43 @@ export default {
 
       this.dialog = true;
     },
-    onSaveInscricao() {
-      const { id, deferido } = this.inscricaoVisualizando;
+    ordenarInscricoes() {
+      this.atualizandoInscricoes = true;
+      this.showList = false;
       this.$http
-        .put(`inscricao/${this.inscricaoVisualizando.id}`, { id, deferido })
+        .put("ordenar-inscricoes")
+        .then(inscricoes => {
+          this.inscricoes = inscricoes;
+          this.showMessage("Inscrições ordenadas com sucesso", "success");
+          this.atualizandoInscricoes = false;
+          this.showList = true;
+        })
+        .catch(error => {
+          this.showMessage(error, "error");
+          this.atualizandoInscricoes = false;
+          this.showList = true;
+        });
+    },
+    alterarPosicao() {
+      const { id, posicao } = this.inscricaoVisualizando;
+
+      this.showList = false;
+
+      this.$http
+        .put(`alterar-posicao/${id}`, { posicao })
         .then(inscricoes => {
           this.inscricoes = inscricoes;
 
-          this.inscricaoVisualizando = this.handleInscricoes.find(
-            inscricao => inscricao.id === this.inscricaoVisualizando.id
-          );
-          this.showMessage("Inscrição atualizada com sucesso", "success");
+          this.showMessage("Posição atualizada com sucesso", "success");
+
+          this.dialog = false;
+          this.showList = true;
         })
-        .catch(error => this.showMessage(error, "error"));
+        .catch(error => {
+          this.showMessage(error, "error");
+          this.dialog = false;
+          this.showList = true;
+        });
     },
     showDialogExclusao(inscricao) {
       this.inscricaoExcluir = inscricao;

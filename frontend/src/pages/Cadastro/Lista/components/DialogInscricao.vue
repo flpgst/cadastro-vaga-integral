@@ -10,7 +10,7 @@
         />
       </v-toolbar-title>
 
-      <v-spacer></v-spacer>
+      <v-spacer />
 
       <v-btn icon @click="$emit('close')">
         <v-icon>
@@ -18,6 +18,7 @@
         </v-icon>
       </v-btn>
     </v-toolbar>
+
     <v-card color="grey lighten-5">
       <v-card-text>
         <v-row>
@@ -37,38 +38,40 @@
               />
             </v-col>
 
-            <v-col v-if="inscricao.editing" cols="auto">
+            <v-col v-if="inscricao.editing" cols="auto" class="px-0">
               <v-tooltip top>
                 <template v-slot:activator="{ on }">
-                  <v-icon
-                    v-text="'mdi-close'"
-                    color="red"
-                    v-on="on"
-                    @click="
-                      (inscricao.posicao = inscricaoOriginal.posicao),
-                        (inscricao.editing = !inscricao.editing)
-                    "
-                  />
+                  <v-btn v-on="on" icon>
+                    <v-icon
+                      v-text="'mdi-close'"
+                      color="red"
+                      @click="
+                        (inscricao.posicao = inscricaoOriginal.posicao),
+                          (inscricao.editing = false)
+                      "
+                    />
+                  </v-btn>
                 </template>
                 Cancelar
               </v-tooltip>
             </v-col>
 
-            <v-col cols="auto" v-if="false">
+            <v-col cols="auto" class="px-0">
               <v-tooltip top>
                 <template v-slot:activator="{ on }">
-                  <v-icon
-                    v-on="on"
-                    v-text="
-                      inscricao.editing ? 'mdi-content-save' : 'mdi-pencil'
-                    "
-                    color="primary"
-                    @click="
-                      inscricao.editing
-                        ? onSaveInscricao()
-                        : (inscricao.editing = true)
-                    "
-                  />
+                  <v-btn v-on="on" icon :disabled="!inscricao.deferido">
+                    <v-icon
+                      v-text="
+                        inscricao.editing ? 'mdi-content-save' : 'mdi-pencil'
+                      "
+                      color="primary"
+                      @click="
+                        inscricao.editing
+                          ? onSaveInscricao('posicao')
+                          : (inscricao.editing = true)
+                      "
+                    />
+                  </v-btn>
                 </template>
                 {{ inscricao.editing ? "Salvar" : "Editar" }}
               </v-tooltip>
@@ -79,12 +82,11 @@
             <CPTSelect
               v-model="inscricao.deferido"
               label="Situação"
-              disabled
               :items="[
                 { value: true, text: 'Deferido' },
                 { value: false, text: 'Indeferido' }
               ]"
-              @input="onSaveInscricao"
+              @input="onSaveInscricao('situacao')"
             />
           </v-col>
         </v-row>
@@ -270,10 +272,10 @@ export default {
     }
   },
   methods: {
-    onSaveInscricao() {
+    onSaveInscricao(parametro) {
       this.inscricao.editing = false;
       this.inscricaoOriginal = { ...this.inscricao };
-      this.$emit("save");
+      this.$emit("save", parametro);
     },
     stringToCpf
   }
