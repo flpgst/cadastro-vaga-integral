@@ -6,7 +6,9 @@
 
         <span
           class="caption"
-          v-text="`Matrícula: ${inscricao.matricula.codigo}`"
+          v-text="
+            `Matrícula: ${inscricao.matricula.codigo} | ${inscricao.matricula.unidadeEnsino.pessoa.nome}`
+          "
         />
       </v-toolbar-title>
 
