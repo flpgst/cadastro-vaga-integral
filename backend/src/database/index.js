@@ -6,6 +6,7 @@ import Usuario from '../app/models/Usuario';
 import Atribuicao from '../app/models/Atribuicao';
 import Grupo from '../app/models/Grupo';
 import UnidadeEnsino from '../app/models/UnidadeEnsino';
+import UnidadeEnsinoTipo from '../app/models/UnidadeEnsinoTipo';
 import Inscricao from '../app/models/Inscricao';
 import Matricula from '../app/models/Matricula';
 import Endereco from '../app/models/Endereco';
@@ -22,6 +23,7 @@ const models = [
   Pessoa,
   Usuario,
   UnidadeEnsino,
+  UnidadeEnsinoTipo,
   Inscricao,
   Matricula,
   Endereco,
