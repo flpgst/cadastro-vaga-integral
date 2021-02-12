@@ -3,17 +3,17 @@ import config from "@/config";
 
 import { getAuthToken, logout } from "./security";
 
-const server = axios.create({
-  baseURL: config.baseURL,
+const erudio = axios.create({
+  baseURL: config.baseURLErudio,
   timeout: 90000
 });
 
-server.interceptors.request.use(config => {
-  config.headers.authorization = getAuthToken("vaga-integral");
+erudio.interceptors.request.use(config => {
+  config.headers["JWT-Authorization"] = getAuthToken("erudio");
   return config;
 });
 
-server.interceptors.response.use(
+erudio.interceptors.response.use(
   ({ data }) => data,
   error => {
     if (error.response.data.message.includes("Token")) logout();
@@ -21,4 +21,4 @@ server.interceptors.response.use(
   }
 );
 
-export default server;
+export default erudio;

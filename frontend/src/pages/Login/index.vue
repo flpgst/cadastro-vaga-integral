@@ -67,20 +67,30 @@ export default {
       this.login();
     },
 
-    login() {
-      this.$http
+    async login() {
+      await this.$http
         .post("login", {
           login: this.username,
           senha: this.password
         })
         .then(({ token, id, nome_exibicao: nome, permissao: role }) => {
-          localStorage.setItem("token", token);
+          localStorage.setItem("token-vaga-integral", token);
 
           localStorage.setItem("user", JSON.stringify({ id, nome, role }));
-
-          window.location.reload();
         })
         .catch(error => this.showMessage(error, "error"));
+
+      let { username, password } = this;
+
+      password = btoa(password);
+
+      await this.$erudio
+        .post("tokens", { username, password })
+        .then(({ token }) => {
+          localStorage.setItem("token-erudio", token);
+        });
+
+      window.location.reload();
     }
   }
 };
