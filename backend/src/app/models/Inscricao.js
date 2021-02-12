@@ -12,7 +12,7 @@ class Inscricao extends Model {
         vulnerabilidade_social: Sequelize.BOOLEAN,
         processo_judicial: Sequelize.STRING,
         posicao: Sequelize.INTEGER,
-        deferido: Sequelize.BOOLEAN,
+        status: Sequelize.ENUM('PENDENTE', 'DEFERIDO', 'INDEFERIDO'),
         matricula_id: Sequelize.INTEGER,
         protocolo: Sequelize.INTEGER,
         ativo: Sequelize.BOOLEAN,
