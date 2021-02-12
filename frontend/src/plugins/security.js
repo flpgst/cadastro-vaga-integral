@@ -1,8 +1,8 @@
 const ADMIN = "Super Administrador";
 const GESTOR = "Gestor";
 
-export function getAuthToken() {
-  const token = localStorage.getItem("token");
+export function getAuthToken(api) {
+  const token = localStorage.getItem(`token-${api}`);
   return token && `Bearer ${token}`;
 }
 
@@ -23,7 +23,7 @@ export function getUser() {
 }
 
 export function isAuthenticated() {
-  return !!localStorage.getItem("token");
+  return !!localStorage.getItem("token-vaga-integral");
 }
 
 export function logout() {

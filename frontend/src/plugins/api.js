@@ -9,7 +9,7 @@ const server = axios.create({
 });
 
 server.interceptors.request.use(config => {
-  config.headers.authorization = getAuthToken();
+  config.headers.authorization = getAuthToken("vaga-integral");
   return config;
 });
 
