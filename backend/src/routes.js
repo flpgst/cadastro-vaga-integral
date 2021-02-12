@@ -10,6 +10,7 @@ import CidadeController from './app/controllers/CidadeController';
 import EstadoController from './app/controllers/EstadoController';
 import ProcessoInscricaoController from './app/controllers/ProcessoInscricaoController';
 import OrdenaInscricaoController from './app/controllers/OrdenaInscricaoController';
+import UnidadeEnsinoController from './app/controllers/UnidadeEnsinoController';
 
 const routes = new Router();
 
@@ -30,5 +31,6 @@ routes.get('/estado', EstadoController.index);
 routes.get('/processo-inscricao', ProcessoInscricaoController.index);
 routes.put('/ordenar-inscricoes', OrdenaInscricaoController.update);
 routes.put('/alterar-posicao/:id', OrdenaInscricaoController.reordenar);
+routes.get('/unidade-ensino', UnidadeEnsinoController.index);
 
 export default routes;
