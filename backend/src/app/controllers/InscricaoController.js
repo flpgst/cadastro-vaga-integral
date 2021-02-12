@@ -160,7 +160,7 @@ class InscricaoController {
 
   async update(req, res, next) {
     try {
-      const { deferido } = req.body;
+      const { status } = req.body;
       const { id } = req.params;
 
       if (!req.superAdmin && !req.gestor)
@@ -173,7 +173,7 @@ class InscricaoController {
         if (!inscricao) {
           return res.status(404).json({ message: 'Inscricão não encontrada' });
         }
-        inscricao.deferido = deferido ?? inscricao.deferido;
+        inscricao.status = status;
 
         await inscricao.save();
 
