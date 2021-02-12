@@ -4,10 +4,12 @@ import Maska from "maska";
 
 import vuetify from "./plugins/vuetify";
 import server from "./plugins/api";
+import erudio from "./plugins/erudio";
 import router from "./router";
 import store from "./store";
 
 Vue.prototype.$http = server;
+Vue.prototype.$erudio = erudio;
 
 Vue.config.productionTip = false;
 
