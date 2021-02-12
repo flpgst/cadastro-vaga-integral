@@ -9,7 +9,7 @@ const erudio = axios.create({
 });
 
 erudio.interceptors.request.use(config => {
-  config.headers.authorization = getAuthToken();
+  config.headers["JWT-Authorization"] = getAuthToken("erudio");
   return config;
 });
 
