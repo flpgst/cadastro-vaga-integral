@@ -8,6 +8,7 @@ import Parentesco from '../models/Parentesco';
 import Pessoa from '../models/Pessoa';
 import ProcessoInscricao from '../models/ProcessoInscricao';
 import UnidadeEnsino from '../models/UnidadeEnsino';
+import UnidadeEnsinoTipo from '../models/UnidadeEnsinoTipo';
 import { cpf } from 'cpf-cnpj-validator';
 import { findMatriculaById } from '../util/finders';
 
@@ -175,7 +176,11 @@ class InscricaoController {
         }
         inscricao.status = status;
 
+        console.log('inscricao :>> ', inscricao);
+
         await inscricao.save();
+
+        // return res.json(inscricao);
 
         const inscricoes = await Inscricao.findAll({
           where: {
@@ -197,7 +202,19 @@ class InscricaoController {
               model: Matricula,
               include: [
                 { model: Pessoa, nested: true, all: true },
-                { model: UnidadeEnsino, include: Pessoa },
+                {
+                  model: UnidadeEnsino,
+                  include: [
+                    {
+                      model: Pessoa,
+                      as: 'pessoa',
+                    },
+                    {
+                      model: UnidadeEnsinoTipo,
+                      as: 'unidadeEnsinoTipo',
+                    },
+                  ],
+                },
               ],
             },
           ],
