@@ -280,6 +280,19 @@
                 return-object
               />
             </v-col>
+
+            <v-col cols="12" class="d-flex justify-end">
+              <CPTBtn
+                label="Salvar"
+                icon="mdi-content-save"
+                @click="
+                  unidadeEnsino.id === inscricao.matricula.unidadeEnsino.id
+                    ? enturmar()
+                    : transferir()
+                "
+                :disabled="!unidadeEnsino || !turma"
+              />
+            </v-col>
           </template>
         </v-row>
       </v-card-text>
@@ -289,6 +302,7 @@
 
 <script>
 import CPTInput from "@/components/Input";
+import CPTBtn from "@/components/Btn";
 import CPTAutocomplete from "@/components/Autocomplete";
 import CPTSelect from "@/components/Select";
 import CPTFormSubtitle from "@/components/FormSubtitle";
@@ -305,6 +319,7 @@ export default {
   name: "dialog-inscricao",
   components: {
     CPTInput,
+    CPTBtn,
     CPTAutocomplete,
     CPTSelect,
     CPTFormSubtitle
@@ -346,11 +361,25 @@ export default {
     }
   },
   methods: {
+    enturmar() {
+      this.$erudio
+        .post("enturmacoes", {
+          matricula: { id: this.inscricao.matricula.id },
+          turma: { id: this.turma.id }
+        })
+        .then(() => {
+          this.showMessage(
+            `${this.inscricao.matricula.pessoa.nome} enturmado na turma ${this.turma.nomeCompleto}`,
+            "success"
+          );
+        })
+        .catch(error => this.showMessage(error, "error"));
+    },
     async getTurmas() {
       const { id: unidadeEnsino } = this.unidadeEnsino;
       this.turmas = await this.$erudio
         .get("turmas", {
-          params: { unidadeEnsino }
+          params: { unidadeEnsino, apelido: "VIN" }
         })
         .catch(error => this.showMessage(error, "error"));
     },
@@ -363,6 +392,8 @@ export default {
         this.unidadesEnsino.find(
           ({ id }) => this.inscricao.matricula.unidadeEnsino.id === id
         ) || null;
+
+      if (this.unidadeEnsino) this.getTurmas();
     },
     onSaveInscricao(parametro) {
       this.loading = true;
@@ -372,7 +403,10 @@ export default {
         this.loading = false;
       });
     },
-    stringToCpf
+    stringToCpf,
+    transferir() {
+      console.log("transferindo...");
+    }
   }
 };
 </script>
