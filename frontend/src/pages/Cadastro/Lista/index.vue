@@ -101,8 +101,8 @@
 
             <td class="d-flex align-center justify-center">
               <v-icon
-                v-text="inscricao.deferido ? 'mdi-check' : 'mdi-close'"
-                :color="inscricao.deferido ? 'green' : 'red'"
+                v-text="getStatusConfig(inscricao.status).icon"
+                :color="getStatusConfig(inscricao.status).color"
               />
             </td>
 
@@ -130,10 +130,10 @@
       v-if="dialog"
       v-model="inscricaoVisualizando"
       @save="
-        parametro =>
+        (parametro, callback) =>
           parametro === 'posicao'
-            ? alterarPosicao()
-            : alterarSituacaoInscricao()
+            ? alterarPosicao(callback)
+            : alterarStatusInscricao(callback)
       "
       @close="dialog = false"
     />
@@ -191,16 +191,15 @@ export default {
   },
 
   data: () => ({
-    protocolo: "",
-    matricula: "",
     aluno: "",
-
+    atualizandoInscricoes: false,
     dialog: false,
     dialogExclusao: true,
-    inscricaoVisualizando: null,
     inscricaoExcluir: null,
+    inscricaoVisualizando: null,
     inscricoes: [],
-    atualizandoInscricoes: false,
+    matricula: "",
+    protocolo: "",
     showList: true
   }),
 
@@ -227,7 +226,7 @@ export default {
         },
         { text: "Vulnerabilidade Social" },
         { text: "Processo Judicial" },
-        { text: "Deferido" }
+        { text: "Status" }
       ];
 
       return this.isAdmin()
@@ -237,22 +236,21 @@ export default {
   },
 
   methods: {
-    alterarSituacaoInscricao() {
-      const { id, deferido } = this.inscricaoVisualizando;
+    alterarStatusInscricao(callback) {
+      const { id, status } = this.inscricaoVisualizando;
 
       this.showList = false;
 
       this.$http
-        .put(`/inscricao/${id}`, { deferido })
+        .put(`/inscricao/${id}`, { status })
         .then(inscricoes => {
           this.inscricoes = inscricoes;
           this.showMessage("Inscrição atualizada com sucesso", "success");
-          this.dialog = false;
+          callback();
           this.showList = true;
         })
         .catch(error => {
           this.showMessage(error, "error");
-          this.dialog = false;
           this.showList = true;
         });
     },
@@ -284,6 +282,18 @@ export default {
         })
         .catch(error => this.showMessage(error, "error"));
     },
+    getStatusConfig(status) {
+      switch (status) {
+        case "DEFERIDO":
+          return { color: "green", icon: "mdi-check" };
+        case "INDEFERIDO":
+          return { color: "red", icon: "mdi-close" };
+        case "PENDENTE":
+          return {
+            icon: "mdi-minus"
+          };
+      }
+    },
     isAdmin,
     onClickInscricao(inscricao) {
       this.inscricaoOriginal = {
@@ -314,7 +324,7 @@ export default {
           this.showList = true;
         });
     },
-    alterarPosicao() {
+    alterarPosicao(callback) {
       const { id, posicao } = this.inscricaoVisualizando;
 
       this.showList = false;
@@ -325,14 +335,13 @@ export default {
           this.inscricoes = inscricoes;
 
           this.showMessage("Posição atualizada com sucesso", "success");
-
-          this.dialog = false;
+          callback();
           this.showList = true;
         })
         .catch(error => {
           this.showMessage(error, "error");
-          this.dialog = false;
           this.showList = true;
+          callback();
         });
     },
     showDialogExclusao(inscricao) {
