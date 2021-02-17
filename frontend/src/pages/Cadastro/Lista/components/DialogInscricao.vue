@@ -95,7 +95,7 @@
               v-model="inscricao.status"
               label="Status"
               :items="status"
-              :disabled="alunoEnturmado"
+              :disabled="loading || alunoEnturmado"
               @input="
                 onSaveInscricao('status'),
                   inscricao.status === DEFERIDO && getUnidadesEnsino()
@@ -278,6 +278,18 @@
                 :disabled="!unidadeEnsino"
                 :items="turmas"
                 itemText="nomeCompleto"
+                :hint="
+                  turma
+                    ? `${turma.quantidadeAlunos}/${turma.limiteAlunos}`
+                    : null
+                "
+                persistent-hint
+                :rules="[
+                  () =>
+                    !turma ||
+                    turma.quantidadeAlunos > turma.limiteAlunos ||
+                    'Não existe mais vaga disponível'
+                ]"
                 label="Turma"
                 noDataText="Nenhuma turma encontrada"
                 return-object
@@ -294,6 +306,7 @@
                     : transferir()
                 "
                 :disabled="!unidadeEnsino || !turma"
+                :loading="loading"
               />
             </v-col>
           </template>
@@ -387,6 +400,8 @@ export default {
             `${this.inscricao.matricula.pessoa.nome} enturmado na turma ${this.turma.nomeCompleto}`,
             "success"
           );
+
+          this.dialog = false;
         })
         .catch(error => this.showMessage(error, "error"));
     },
@@ -415,7 +430,7 @@ export default {
       const { id: unidadeEnsino } = this.unidadeEnsino;
       this.turmas = await this.$erudio
         .get("turmas", {
-          params: { unidadeEnsino, apelido: "VIN" }
+          params: { unidadeEnsino, apelido: "VIN", view: "DETAILS" }
         })
         .catch(error => this.showMessage(error, "error"));
     },
@@ -441,7 +456,23 @@ export default {
     },
     stringToCpf,
     transferir() {
-      console.log("transferindo...");
+      this.$erudio
+        .post("transferencias", {
+          justificativa: "DEFERIDO NO CADASTRO DE VAGA INTEGRAL",
+          matricula: { id: this.inscricao.matricula.id },
+          unidadeEnsinoDestino: { id: this.unidadeEnsino.id },
+          unidadeEnsinoOrigem: { id: this.inscricao.matricula.unidadeEnsino.id }
+        })
+        .then(({ id }) => {
+          this.$erudio
+            .put(`transferencias/${id}`, {
+              id,
+              status: "ACEITO"
+            })
+            .then(() => this.enturmar())
+            .catch(error => this.showMessage(error, "error"));
+        })
+        .catch(error => this.showMessage(error, "error"));
     }
   }
 };
