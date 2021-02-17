@@ -176,11 +176,7 @@ class InscricaoController {
         }
         inscricao.status = status;
 
-        console.log('inscricao :>> ', inscricao);
-
         await inscricao.save();
-
-        // return res.json(inscricao);
 
         const inscricoes = await Inscricao.findAll({
           where: {
