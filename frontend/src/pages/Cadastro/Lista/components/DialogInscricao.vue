@@ -7,7 +7,7 @@
         <span
           class="caption"
           v-text="
-            `Matrícula: ${inscricao.matricula.codigo} | ${inscricao.matricula.unidadeEnsino.pessoa.nome}`
+            `Matrícula: ${inscricao.matricula.codigo} | ${inscricao.matricula.unidadeEnsino.nomeCompleto}`
           "
         />
       </v-toolbar-title>
@@ -21,7 +21,10 @@
       </v-btn>
     </v-toolbar>
 
-    <v-card color="grey lighten-5">
+    <v-card color="grey lighten-5" :loading="loading">
+      <template slot="progress">
+        <v-progress-linear color="primary" height="5" indeterminate />
+      </template>
       <v-card-text>
         <v-row>
           <v-col
@@ -61,7 +64,12 @@
             <v-col cols="auto" class="px-0">
               <v-tooltip top>
                 <template v-slot:activator="{ on }">
-                  <v-btn v-on="on" icon :disabled="!inscricao.deferido">
+                  <v-btn
+                    v-on="on"
+                    icon
+                    :disabled="inscricao.status !== DEFERIDO || loading"
+                    color="primary"
+                  >
                     <v-icon
                       v-text="
                         inscricao.editing ? 'mdi-content-save' : 'mdi-pencil'
@@ -82,13 +90,13 @@
 
           <v-col cols="6" class="pa-0">
             <CPTSelect
-              v-model="inscricao.deferido"
-              label="Situação"
-              :items="[
-                { value: true, text: 'Deferido' },
-                { value: false, text: 'Indeferido' }
-              ]"
-              @input="onSaveInscricao('situacao')"
+              v-model="inscricao.status"
+              label="Status"
+              :items="status"
+              @input="
+                onSaveInscricao('status'),
+                  inscricao.status === DEFERIDO && getUnidadesEnsino()
+              "
             />
           </v-col>
         </v-row>
@@ -229,6 +237,50 @@
               </template>
             </v-data-table>
           </v-col>
+
+          <v-col cols="12">
+            <CPTFormSubtitle label="Unidade de Ensino" />
+          </v-col>
+
+          <v-col
+            v-if="inscricao.status !== DEFERIDO"
+            cols="12"
+            v-text="'É necessário deferir a inscrição antes de alocar o aluno'"
+          />
+
+          <template v-else-if="loading">
+            <v-col cols="6">
+              <v-skeleton-loader type="text" />
+            </v-col>
+            <v-col cols="6">
+              <v-skeleton-loader type="text" />
+            </v-col>
+          </template>
+
+          <template v-else>
+            <v-col cols="6">
+              <CPTAutocomplete
+                v-model="unidadeEnsino"
+                :items="unidadesEnsino"
+                itemText="nomeCompleto"
+                label="Unidade de Ensino"
+                noDataText="Nenhuma unidade encontrada"
+                return-object
+                @change="getTurmas()"
+              />
+            </v-col>
+            <v-col cols="6">
+              <CPTAutocomplete
+                v-model="turma"
+                :disabled="!unidadeEnsino"
+                :items="turmas"
+                itemText="nomeCompleto"
+                label="Turma"
+                noDataText="Nenhuma turma encontrada"
+                return-object
+              />
+            </v-col>
+          </template>
         </v-row>
       </v-card-text>
     </v-card>
@@ -237,15 +289,23 @@
 
 <script>
 import CPTInput from "@/components/Input";
+import CPTAutocomplete from "@/components/Autocomplete";
 import CPTSelect from "@/components/Select";
 import CPTFormSubtitle from "@/components/FormSubtitle";
 
 import stringToCpf from "@/utils/stringToCpf";
 
+const DEFERIDO = "DEFERIDO";
+const INDEFERIDO = "INDEFERIDO";
+const PENDENTE = "PENDENTE";
+
+const status = [DEFERIDO, INDEFERIDO, PENDENTE];
+
 export default {
   name: "dialog-inscricao",
   components: {
     CPTInput,
+    CPTAutocomplete,
     CPTSelect,
     CPTFormSubtitle
   },
@@ -259,9 +319,21 @@ export default {
     this.endereco = this.inscricao.matricula.pessoa.endereco;
     this.inscricaoOriginal = { ...this.inscricao };
   },
+  mounted() {
+    this.inscricao.status === DEFERIDO && this.getUnidadesEnsino();
+  },
   data: () => ({
+    DEFERIDO,
+    INDEFERIDO,
+    PENDENTE,
     endereco: null,
-    inscricaoOriginal: null
+    inscricaoOriginal: null,
+    loading: false,
+    status,
+    turma: null,
+    turmas: [],
+    unidadeEnsino: null,
+    unidadesEnsino: []
   }),
   computed: {
     inscricao: {
@@ -274,10 +346,31 @@ export default {
     }
   },
   methods: {
+    async getTurmas() {
+      const { id: unidadeEnsino } = this.unidadeEnsino;
+      this.turmas = await this.$erudio
+        .get("turmas", {
+          params: { unidadeEnsino }
+        })
+        .catch(error => this.showMessage(error, "error"));
+    },
+    async getUnidadesEnsino() {
+      this.unidadesEnsino = await this.$erudio
+        .get("unidades-ensino", { params: { tipo_sigla: "UC" } })
+        .catch(error => this.showMessage(error, "error"));
+
+      this.unidadeEnsino =
+        this.unidadesEnsino.find(
+          ({ id }) => this.inscricao.matricula.unidadeEnsino.id === id
+        ) || null;
+    },
     onSaveInscricao(parametro) {
+      this.loading = true;
       this.inscricao.editing = false;
       this.inscricaoOriginal = { ...this.inscricao };
-      this.$emit("save", parametro);
+      this.$emit("save", parametro, () => {
+        this.loading = false;
+      });
     },
     stringToCpf
   }
