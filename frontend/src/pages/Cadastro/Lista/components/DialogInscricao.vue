@@ -287,8 +287,8 @@
                 :rules="[
                   () =>
                     !turma ||
-                    turma.quantidadeAlunos > turma.limiteAlunos ||
-                    'Não existe mais vaga disponível'
+                    turma.quantidadeAlunos < turma.limiteAlunos ||
+                    'Nenhuma vaga disponível nesta turma'
                 ]"
                 label="Turma"
                 noDataText="Nenhuma turma encontrada"
@@ -305,7 +305,7 @@
                     ? enturmar()
                     : transferir()
                 "
-                :disabled="!unidadeEnsino || !turma"
+                :disabled="!unidadeEnsino || !turma || turma.quantidadeAlunos >= turma.limiteAlunos"
                 :loading="loading"
               />
             </v-col>
@@ -401,7 +401,7 @@ export default {
             "success"
           );
 
-          this.dialog = false;
+          this.$emit('close');
         })
         .catch(error => this.showMessage(error, "error"));
     },
