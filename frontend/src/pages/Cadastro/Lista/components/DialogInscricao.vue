@@ -67,7 +67,9 @@
                   <v-btn
                     v-on="on"
                     icon
-                    :disabled="inscricao.status !== DEFERIDO || loading"
+                    :disabled="
+                      inscricao.status !== DEFERIDO || loading || alunoEnturmado
+                    "
                     color="primary"
                   >
                     <v-icon
@@ -93,6 +95,7 @@
               v-model="inscricao.status"
               label="Status"
               :items="status"
+              :disabled="alunoEnturmado"
               @input="
                 onSaveInscricao('status'),
                   inscricao.status === DEFERIDO && getUnidadesEnsino()
@@ -257,7 +260,7 @@
             </v-col>
           </template>
 
-          <template v-else>
+          <template v-else-if="!alunoEnturmado">
             <v-col cols="6">
               <CPTAutocomplete
                 v-model="unidadeEnsino"
@@ -294,6 +297,14 @@
               />
             </v-col>
           </template>
+
+          <v-col
+            v-else
+            v-text="
+              `${inscricao.matricula.pessoa.nome} ENTURMADO NA TURMA ${turma.nomeCompleto} - ${turma.unidadeEnsino.nomeCompleto}`
+            "
+            class="text-uppercase"
+          />
         </v-row>
       </v-card-text>
     </v-card>
@@ -335,12 +346,16 @@ export default {
     this.inscricaoOriginal = { ...this.inscricao };
   },
   mounted() {
-    this.inscricao.status === DEFERIDO && this.getUnidadesEnsino();
+    if (this.inscricao.status === DEFERIDO) {
+      this.getUnidadesEnsino();
+      this.getEnturmacao();
+    }
   },
   data: () => ({
     DEFERIDO,
     INDEFERIDO,
     PENDENTE,
+    alunoEnturmado: false,
     endereco: null,
     inscricaoOriginal: null,
     loading: false,
@@ -374,6 +389,27 @@ export default {
           );
         })
         .catch(error => this.showMessage(error, "error"));
+    },
+    getEnturmacao() {
+      this.loading = true;
+      this.$erudio
+        .get("enturmacoes", {
+          params: {
+            matricula: this.inscricao.matricula.id,
+            emAndamento: 1
+          }
+        })
+        .then(enturmacoes => {
+          this.loading = false;
+
+          if (!enturmacoes.length) return;
+
+          this.turma = enturmacoes
+            .map(({ turma }) => turma)
+            .find(({ apelido }) => apelido.toUpperCase() === "VIN");
+
+          this.alunoEnturmado = !!this.turma;
+        });
     },
     async getTurmas() {
       const { id: unidadeEnsino } = this.unidadeEnsino;
