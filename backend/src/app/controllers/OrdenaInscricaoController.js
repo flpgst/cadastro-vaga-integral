@@ -39,7 +39,19 @@ class OrdenarInscricaoController {
               model: Matricula,
               include: [
                 { model: Pessoa, nested: true, all: true },
-                { model: UnidadeEnsino, include: Pessoa },
+                {
+                  model: UnidadeEnsino,
+                  include: [
+                    {
+                      model: Pessoa,
+                      as: 'pessoa',
+                    },
+                    {
+                      model: UnidadeEnsinoTipo,
+                      as: 'unidadeEnsinoTipo',
+                    },
+                  ],
+                },
               ],
             },
           ],
