@@ -305,7 +305,11 @@
                     ? enturmar()
                     : transferir()
                 "
-                :disabled="!unidadeEnsino || !turma || turma.quantidadeAlunos >= turma.limiteAlunos"
+                :disabled="
+                  !unidadeEnsino ||
+                    !turma ||
+                    turma.quantidadeAlunos >= turma.limiteAlunos
+                "
                 :loading="loading"
               />
             </v-col>
@@ -401,7 +405,7 @@ export default {
             "success"
           );
 
-          this.$emit('close');
+          this.$emit("close");
         })
         .catch(error => this.showMessage(error, "error"));
     },
