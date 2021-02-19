@@ -305,7 +305,11 @@
                     ? enturmar()
                     : transferir()
                 "
-                :disabled="!unidadeEnsino || !turma || turma.quantidadeAlunos >= turma.limiteAlunos"
+                :disabled="
+                  !unidadeEnsino ||
+                    !turma ||
+                    turma.quantidadeAlunos >= turma.limiteAlunos
+                "
                 :loading="loading"
               />
             </v-col>
@@ -395,13 +399,15 @@ export default {
           matricula: { id: this.inscricao.matricula.id },
           turma: { id: this.turma.id }
         })
-        .then(() => {
+        .then(enturmacao => {
           this.showMessage(
             `${this.inscricao.matricula.pessoa.nome} enturmado na turma ${this.turma.nomeCompleto}`,
             "success"
           );
 
-          this.$emit('close');
+          this.$http.post("envia-email", enturmacao);
+
+          this.$emit("close");
         })
         .catch(error => this.showMessage(error, "error"));
     },
