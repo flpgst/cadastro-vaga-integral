@@ -399,11 +399,13 @@ export default {
           matricula: { id: this.inscricao.matricula.id },
           turma: { id: this.turma.id }
         })
-        .then(() => {
+        .then(enturmacao => {
           this.showMessage(
             `${this.inscricao.matricula.pessoa.nome} enturmado na turma ${this.turma.nomeCompleto}`,
             "success"
           );
+
+          this.$http.post("envia-email", enturmacao);
 
           this.$emit("close");
         })
