@@ -11,6 +11,7 @@ import EstadoController from './app/controllers/EstadoController';
 import ProcessoInscricaoController from './app/controllers/ProcessoInscricaoController';
 import OrdenaInscricaoController from './app/controllers/OrdenaInscricaoController';
 import UnidadeEnsinoController from './app/controllers/UnidadeEnsinoController';
+import EmailController from './app/controllers/EmailController';
 
 const routes = new Router();
 
@@ -32,5 +33,6 @@ routes.get('/processo-inscricao', ProcessoInscricaoController.index);
 routes.put('/ordenar-inscricoes', OrdenaInscricaoController.update);
 routes.put('/alterar-posicao/:id', OrdenaInscricaoController.reordenar);
 routes.get('/unidade-ensino', UnidadeEnsinoController.index);
+routes.post('/envia-email', EmailController.store);
 
 export default routes;

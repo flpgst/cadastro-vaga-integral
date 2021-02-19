@@ -8,6 +8,7 @@ class Pessoa extends Model {
       {
         nome: Sequelize.STRING,
         cpf_cnpj: Sequelize.STRING,
+        email: Sequelize.STRING,
         data_cadastro: {
           type: Sequelize.DATE,
           field: 'data_cadastro',

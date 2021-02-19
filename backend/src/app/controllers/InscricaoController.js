@@ -73,7 +73,6 @@ class InscricaoController {
           ativo: true,
         },
       });
-      console.log('hasInscricao :>> ', hasInscricao);
       if (hasInscricao)
         throw new ErrorHandler(
           401,
