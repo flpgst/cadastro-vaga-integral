@@ -392,7 +392,7 @@ export default {
     }
   },
   methods: {
-    enturmar(tipo = "ENTURMACAO") {
+    enturmar() {
       this.$erudio
         .post("enturmacoes", {
           matricula: { id: this.inscricao.matricula.id },
@@ -404,7 +404,9 @@ export default {
             "success"
           );
 
-          this.$http.post("envia-email", { enturmacao, tipo }).catch(() => {});
+          this.$http
+            .post("envia-email", { enturmacao, inscricao: this.inscricao })
+            .catch(() => {});
 
           this.$emit("close");
         })
@@ -501,7 +503,7 @@ export default {
           );
 
           this.$http
-            .post("envia-email", { enturmacao, tipo: "MOVIMENTACAO" })
+            .post("envia-email", { enturmacao, inscricao: this.inscricao })
             .catch(() => {});
         })
         .catch(error => this.showMessage(error, "error"));
