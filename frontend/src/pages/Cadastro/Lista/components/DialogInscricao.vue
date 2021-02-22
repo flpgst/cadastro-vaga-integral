@@ -300,11 +300,7 @@
               <CPTBtn
                 label="Salvar"
                 icon="mdi-content-save"
-                @click="
-                  unidadeEnsino.id === inscricao.matricula.unidadeEnsino.id
-                    ? enturmar()
-                    : transferir()
-                "
+                @click="onSave"
                 :disabled="
                   !unidadeEnsino ||
                     !turma ||
@@ -343,6 +339,8 @@ const PENDENTE = "PENDENTE";
 
 const status = [DEFERIDO, INDEFERIDO, PENDENTE];
 
+const JUSTIFICATIVA = "DEFERIDO NO CADASTRO DE VAGA INTEGRAL";
+
 export default {
   name: "dialog-inscricao",
   components: {
@@ -374,6 +372,7 @@ export default {
     PENDENTE,
     alunoEnturmado: false,
     endereco: null,
+    enturmacoes: [],
     inscricaoOriginal: null,
     loading: false,
     status,
@@ -393,7 +392,7 @@ export default {
     }
   },
   methods: {
-    enturmar() {
+    enturmar(tipo = "ENTURMACAO") {
       this.$erudio
         .post("enturmacoes", {
           matricula: { id: this.inscricao.matricula.id },
@@ -405,7 +404,7 @@ export default {
             "success"
           );
 
-          this.$http.post("envia-email", enturmacao);
+          this.$http.post("envia-email", { enturmacao, tipo }).catch(() => {});
 
           this.$emit("close");
         })
@@ -422,12 +421,13 @@ export default {
         })
         .then(enturmacoes => {
           this.loading = false;
+          this.enturmacoes = enturmacoes;
 
-          if (!enturmacoes.length) return;
+          if (!this.enturmacoes.length) return;
 
-          this.turma = enturmacoes
-            .map(({ turma }) => turma)
-            .find(({ apelido }) => apelido.toUpperCase() === "VIN");
+          this.turma = this.enturmacoes.find(
+            ({ turma }) => turma.apelido.toUpperCase() === "VIN"
+          )?.turma;
 
           this.alunoEnturmado = !!this.turma;
         });
@@ -452,6 +452,32 @@ export default {
 
       if (this.unidadeEnsino) this.getTurmas();
     },
+    onSave() {
+      const enturmado = !!this.enturmacoes.length;
+
+      const sameUnidade =
+        this.unidadeEnsino.id === this.inscricao.matricula.unidadeEnsino.id;
+
+      const sameEtapa = this.enturmacoes.find(
+        ({ matricula }) => matricula.etapaAtual.id === this.turma.etapa.id
+      );
+
+      if (!sameUnidade) return this.transferir();
+
+      if (sameUnidade && !enturmado) return this.enturmar();
+
+      if (sameUnidade && sameEtapa)
+        return this.movimentar(
+          this.enturmacoes.find(
+            ({ turma }) => turma.unidadeEnsino.id === this.unidadeEnsino.id
+          )
+        );
+
+      return this.showMessage(
+        "Aluno matriculado no Erudio em etapa diferente da turma selecionada",
+        "error"
+      );
+    },
     onSaveInscricao(parametro) {
       this.loading = true;
       this.inscricao.editing = false;
@@ -460,11 +486,32 @@ export default {
         this.loading = false;
       });
     },
+    movimentar(enturmacao) {
+      this.$erudio
+        .post("movimentacoes-turma", {
+          enturmacaoOrigem: { id: enturmacao.id },
+          justificativa: JUSTIFICATIVA,
+          matricula: { id: this.inscricao.matricula.id },
+          turmaDestino: { id: this.turma.id }
+        })
+        .then(() => {
+          this.showMessage(
+            `${this.inscricao.matricula.pessoa.nome} enturmado na turma ${this.turma.nomeCompleto}`,
+            "success"
+          );
+
+          this.$http
+            .post("envia-email", { enturmacao, tipo: "MOVIMENTACAO" })
+            .catch(() => {});
+        })
+        .catch(error => this.showMessage(error, "error"));
+    },
     stringToCpf,
+
     transferir() {
       this.$erudio
         .post("transferencias", {
-          justificativa: "DEFERIDO NO CADASTRO DE VAGA INTEGRAL",
+          justificativa: JUSTIFICATIVA,
           matricula: { id: this.inscricao.matricula.id },
           unidadeEnsinoDestino: { id: this.unidadeEnsino.id },
           unidadeEnsinoOrigem: { id: this.inscricao.matricula.unidadeEnsino.id }
@@ -475,7 +522,9 @@ export default {
               id,
               status: "ACEITO"
             })
-            .then(() => this.enturmar())
+            .then(() => {
+              this.enturmar("TRANSFERENCIA");
+            })
             .catch(error => this.showMessage(error, "error"));
         })
         .catch(error => this.showMessage(error, "error"));
