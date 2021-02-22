@@ -9,6 +9,7 @@ import UnidadeEnsino from '../app/models/UnidadeEnsino';
 import UnidadeEnsinoTipo from '../app/models/UnidadeEnsinoTipo';
 import Inscricao from '../app/models/Inscricao';
 import Matricula from '../app/models/Matricula';
+import Etapa from '../app/models/Etapa';
 import Endereco from '../app/models/Endereco';
 import Cidade from '../app/models/Cidade';
 import Estado from '../app/models/Estado';
@@ -26,6 +27,7 @@ const models = [
   UnidadeEnsinoTipo,
   Inscricao,
   Matricula,
+  Etapa,
   Endereco,
   Cidade,
   Estado,

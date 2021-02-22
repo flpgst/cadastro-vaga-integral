@@ -38,6 +38,13 @@ class Matricula extends Model {
         field: 'unidade_ensino_id',
       },
     });
+    this.belongsTo(models.etapa, {
+      foreignKey: {
+        name: 'etapaId',
+        type: Sequelize.INTEGER,
+        field: 'etapa_id',
+      },
+    });
   }
 }
 
