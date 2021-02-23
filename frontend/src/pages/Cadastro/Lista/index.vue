@@ -52,14 +52,16 @@
 
     <v-col cols="12" v-else>
       <v-data-table
-        disable-sort
-        :items-per-page="50"
-        no-results-text="Nenhuma inscrição encontrada"
-        :headers="headers"
-        :items="inscricoes"
         :footer-props="{
           'items-per-page-options': [10, 25, 50]
         }"
+        :headers="headers"
+        :items-per-page="50"
+        :items="inscricoes"
+        :page="tablePage"
+        disable-sort
+        no-results-text="Nenhuma inscrição encontrada"
+        @pagination="({ page }) => (tablePage = page)"
       >
         <template v-slot:item="{ item: inscricao }">
           <tr
@@ -200,7 +202,8 @@ export default {
     inscricoes: [],
     matricula: "",
     protocolo: "",
-    showList: true
+    showList: true,
+    tablePage: 1
   }),
 
   computed: {
