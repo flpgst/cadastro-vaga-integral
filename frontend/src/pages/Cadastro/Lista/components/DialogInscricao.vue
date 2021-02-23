@@ -248,7 +248,11 @@
           <v-col
             v-if="inscricao.status !== DEFERIDO"
             cols="12"
-            v-text="'É necessário deferir a inscrição antes de alocar o aluno'"
+            v-text="
+              alunoEnturmado
+                ? 'Este aluno já está enturmado em uma turma do tipo VIN'
+                : 'É necessário deferir a inscrição antes de alocar o aluno'
+            "
           />
 
           <template v-else-if="loading">
