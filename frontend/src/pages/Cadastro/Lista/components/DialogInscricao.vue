@@ -265,6 +265,7 @@
               <CPTAutocomplete
                 v-model="unidadeEnsino"
                 :items="unidadesEnsino"
+                :disabled="loadingBtn"
                 itemText="nomeCompleto"
                 label="Unidade de Ensino"
                 noDataText="Nenhuma unidade encontrada"
@@ -275,7 +276,7 @@
             <v-col cols="6">
               <CPTAutocomplete
                 v-model="turma"
-                :disabled="!unidadeEnsino"
+                :disabled="!unidadeEnsino || loadingBtn"
                 :items="turmas"
                 itemText="nomeCompleto"
                 :hint="
@@ -306,7 +307,7 @@
                     !turma ||
                     turma.quantidadeAlunos >= turma.limiteAlunos
                 "
-                :loading="loading"
+                :loading="loadingBtn"
               />
             </v-col>
           </template>
@@ -361,10 +362,9 @@ export default {
     this.inscricaoOriginal = { ...this.inscricao };
   },
   mounted() {
-    if (this.inscricao.status === DEFERIDO) {
-      this.getUnidadesEnsino();
-      this.getEnturmacao();
-    }
+    if (this.inscricao.status === DEFERIDO) this.getUnidadesEnsino();
+
+    this.getEnturmacao();
   },
   data: () => ({
     DEFERIDO,
@@ -375,6 +375,7 @@ export default {
     enturmacoes: [],
     inscricaoOriginal: null,
     loading: false,
+    loadingBtn: false,
     status,
     turma: null,
     turmas: [],
@@ -393,12 +394,14 @@ export default {
   },
   methods: {
     enturmar(tipo = "ENTURMACAO") {
+      this.loadingBtn = true;
       this.$erudio
         .post("enturmacoes", {
           matricula: { id: this.inscricao.matricula.id },
           turma: { id: this.turma.id }
         })
         .then(enturmacao => {
+          this.loadingBtn = false;
           this.showMessage(
             `${this.inscricao.matricula.pessoa.nome} enturmado na turma ${this.turma.nomeCompleto}`,
             "success"
@@ -408,7 +411,10 @@ export default {
 
           this.$emit("close");
         })
-        .catch(error => this.showMessage(error, "error"));
+        .catch(error => {
+          this.showMessage(error, "error");
+          this.loadingBtn = false;
+        });
     },
     getEnturmacao() {
       this.loading = true;
@@ -487,6 +493,7 @@ export default {
       });
     },
     movimentar(enturmacao) {
+      this.loadingBtn = true;
       this.$erudio
         .post("movimentacoes-turma", {
           enturmacaoOrigem: { id: enturmacao.id },
@@ -495,6 +502,7 @@ export default {
           turmaDestino: { id: this.turma.id }
         })
         .then(() => {
+          this.loadingBtn = false;
           this.showMessage(
             `${this.inscricao.matricula.pessoa.nome} enturmado na turma ${this.turma.nomeCompleto}`,
             "success"
@@ -503,12 +511,18 @@ export default {
           this.$http
             .post("envia-email", { enturmacao, tipo: "MOVIMENTACAO" })
             .catch(() => {});
+
+          this.$emit("close");
         })
-        .catch(error => this.showMessage(error, "error"));
+        .catch(error => {
+          this.showMessage(error, "error");
+          this.loadingBtn = false;
+        });
     },
     stringToCpf,
-
     transferir() {
+      this.loadingBtn = true;
+
       this.$erudio
         .post("transferencias", {
           justificativa: JUSTIFICATIVA,
@@ -525,9 +539,15 @@ export default {
             .then(() => {
               this.enturmar("TRANSFERENCIA");
             })
-            .catch(error => this.showMessage(error, "error"));
+            .catch(error => {
+              this.showMessage(error, "error");
+              this.loadingBtn = false;
+            });
         })
-        .catch(error => this.showMessage(error, "error"));
+        .catch(error => {
+          this.showMessage(error, "error");
+          this.loadingBtn = false;
+        });
     }
   }
 };
