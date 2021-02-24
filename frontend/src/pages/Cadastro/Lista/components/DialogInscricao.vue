@@ -7,7 +7,7 @@
         <span
           class="caption"
           v-text="
-            `Matrícula: ${inscricao.matricula.codigo} | ${inscricao.matricula.unidadeEnsino.nomeCompleto}`
+            `Matrícula: ${inscricao.matricula.codigo} - ${inscricao.matricula.etapa.nome} | ${inscricao.matricula.unidadeEnsino.nomeCompleto}`
           "
         />
       </v-toolbar-title>
