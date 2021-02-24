@@ -7,7 +7,9 @@
         <span
           class="caption"
           v-text="
-            `Matrícula: ${inscricao.matricula.codigo} - ${inscricao.matricula.etapa.nome} | ${inscricao.matricula.unidadeEnsino.nomeCompleto}`
+            `Matrícula: ${inscricao.matricula.codigo}  ${
+              etapaAtual ? ' - ' + etapaAtual : ''
+            } | ${inscricao.matricula.unidadeEnsino.nomeCompleto}`
           "
         />
       </v-toolbar-title>
@@ -382,6 +384,7 @@ export default {
     alunoEnturmado: false,
     endereco: null,
     enturmacoes: [],
+    etapaAtual: null,
     inscricaoOriginal: null,
     loading: false,
     loadingBtn: false,
@@ -441,6 +444,8 @@ export default {
           this.enturmacoes = enturmacoes;
 
           if (!this.enturmacoes.length) return;
+
+          this.etapaAtual = this.inscricao.matricula.etapa.nome;
 
           this.turma = this.enturmacoes.find(
             ({ turma }) => turma.apelido.toUpperCase() === "VIN"
