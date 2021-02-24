@@ -11,6 +11,7 @@ import UnidadeEnsino from '../models/UnidadeEnsino';
 import UnidadeEnsinoTipo from '../models/UnidadeEnsinoTipo';
 import { cpf } from 'cpf-cnpj-validator';
 import { findMatriculaById } from '../util/finders';
+import sequelize from 'sequelize';
 
 class InscricaoController {
   async store(req, res, next) {
@@ -149,7 +150,10 @@ class InscricaoController {
           all: true,
           nested: true,
         },
-        order: [['posicao', 'ASC']],
+        order: [
+          sequelize.fn('isnull', sequelize.col('posicao')),
+          ['posicao', 'ASC'],
+        ],
       });
 
       return res.status(200).json(inscricoes);
