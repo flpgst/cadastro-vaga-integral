@@ -7,6 +7,16 @@ class Matricula extends Model {
     super.init(
       {
         codigo: Sequelize.INTEGER,
+        status: Sequelize.ENUM(
+          'CURSANDO',
+          'APROVADO',
+          'REPROVADO',
+          'TRANCADO',
+          'ABANDONO',
+          'FALECIDO',
+          'CANCELADO',
+          'MUDANCA_DE_CURSO'
+        ),
         data_cadastro: {
           type: Sequelize.DATE,
           field: 'data_cadastro',
