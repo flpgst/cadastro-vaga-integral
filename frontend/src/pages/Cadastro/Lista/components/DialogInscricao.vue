@@ -245,13 +245,18 @@
             <CPTFormSubtitle label="Unidade de Ensino" />
           </v-col>
 
+          <v-col v-if="inscricao.matricula.status !== 'CURSANDO'">
+            O STATUS DESTA MATRÍCULA É
+            <strong>{{ inscricao.matricula.status }}</strong>
+          </v-col>
+
           <v-col
-            v-if="inscricao.status !== DEFERIDO"
+            v-else-if="inscricao.status !== DEFERIDO"
             cols="12"
             v-text="
               alunoEnturmado
-                ? 'Este aluno já está enturmado em uma turma do tipo VIN'
-                : 'É necessário deferir a inscrição antes de alocar o aluno'
+                ? 'ESTE ALUNO JÁ ESTÁ ENTURMADO EM UMA TURMA DO TIPO VIN'
+                : 'É NECESSÁRIO DEFERIR A INSCRIÇÃO ANTES DE ALOCAR O ALUNO'
             "
           />
 
