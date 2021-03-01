@@ -295,6 +295,11 @@ export default {
           return {
             icon: "mdi-minus"
           };
+        case "DESISTENTE":
+          return {
+            icon: "mdi-account-off",
+            color: "red"
+          };
       }
     },
     isAdmin,

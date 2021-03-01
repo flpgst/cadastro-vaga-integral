@@ -7,7 +7,9 @@
         <span
           class="caption"
           v-text="
-            `Matrícula: ${inscricao.matricula.codigo} | ${inscricao.matricula.unidadeEnsino.nomeCompleto}`
+            `Matrícula: ${inscricao.matricula.codigo}  ${
+              etapaAtual ? ' - ' + etapaAtual : ''
+            } | ${inscricao.matricula.unidadeEnsino.nomeCompleto}`
           "
         />
       </v-toolbar-title>
@@ -358,8 +360,9 @@ import { format, parseISO } from "date-fns";
 const DEFERIDO = "DEFERIDO";
 const INDEFERIDO = "INDEFERIDO";
 const PENDENTE = "PENDENTE";
+const DESISTENTE = "DESISTENTE";
 
-const status = [DEFERIDO, INDEFERIDO, PENDENTE];
+const status = [DEFERIDO, INDEFERIDO, PENDENTE, DESISTENTE];
 
 const JUSTIFICATIVA = "DEFERIDO NO CADASTRO DE VAGA INTEGRAL";
 
@@ -394,6 +397,7 @@ export default {
     alunoEnturmado: false,
     endereco: null,
     enturmacoes: [],
+    etapaAtual: null,
     inscricaoOriginal: null,
     loading: false,
     loadingBtn: false,
@@ -454,6 +458,8 @@ export default {
           this.enturmacoes = enturmacoes;
 
           if (!this.enturmacoes.length) return;
+
+          this.etapaAtual = this.inscricao.matricula.etapa.nome;
 
           this.turma = this.enturmacoes.find(
             ({ turma }) => turma.apelido.toUpperCase() === "VIN"

@@ -19,7 +19,7 @@ class InscricaoController {
       const inscricao = req.body;
       const matricula = await findMatriculaById(inscricao.matricula_id);
 
-      if (!req.superAdmin) throw new ErrorHandler(401, 'Não autorizado');
+      // if (!req.superAdmin) throw new ErrorHandler(401, 'Não autorizado');
 
       const {
         logradouro,
