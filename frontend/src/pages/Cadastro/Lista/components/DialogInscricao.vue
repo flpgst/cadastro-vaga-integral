@@ -29,8 +29,19 @@
         <v-row>
           <v-col
             cols="12"
-            class="title py-5"
+            class="title pt-5 pb-0"
             v-text="`Protocolo: ${inscricao.protocolo}`"
+          />
+
+          <v-col
+            cols="12"
+            class="caption pt-0 mb-2"
+            v-text="
+              `Data da Inscrição: ${format(
+                parseISO(inscricao.data_cadastro),
+                'dd/MM/yyyy'
+              )}`
+            "
           />
 
           <v-col cols="6" class="pa-0 d-flex">
@@ -342,6 +353,7 @@ import CPTSelect from "@/components/Select";
 import CPTFormSubtitle from "@/components/FormSubtitle";
 
 import stringToCpf from "@/utils/stringToCpf";
+import { format, parseISO } from "date-fns";
 
 const DEFERIDO = "DEFERIDO";
 const INDEFERIDO = "INDEFERIDO";
@@ -427,6 +439,7 @@ export default {
           this.loadingBtn = false;
         });
     },
+    format,
     getEnturmacao() {
       this.loading = true;
       this.$erudio
@@ -503,6 +516,7 @@ export default {
         this.loading = false;
       });
     },
+    parseISO,
     movimentar(enturmacao) {
       this.loadingBtn = true;
       this.$erudio
