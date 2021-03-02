@@ -217,7 +217,10 @@ class InscricaoController {
               ],
             },
           ],
-          order: ['posicao', 'id'],
+          order: [
+            sequelize.fn('isnull', sequelize.col('posicao')),
+            ['posicao', 'ASC'],
+          ],
         });
         return res.json(inscricoes);
       } catch (error) {
