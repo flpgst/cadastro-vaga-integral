@@ -527,8 +527,6 @@ export default {
         this.processoInscricao
       );
 
-      console.log(inscricao);
-
       if (!this.rendaPerCapta())
         return this.handleRendaPerCaptaZerada(inscricao);
 
