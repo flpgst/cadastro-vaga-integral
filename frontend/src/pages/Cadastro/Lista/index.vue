@@ -135,14 +135,15 @@
         (parametro, callback) =>
           parametro === 'posicao'
             ? alterarPosicao(callback)
-            : alterarStatusInscricao(callback)
+            : atualizarInscricao(callback)
       "
       @close="dialog = false"
+      @update="atualizarInscricao"
     />
 
     <v-dialog v-if="inscricaoExcluir" v-model="dialogExclusao" width="750">
       <v-card>
-        <v-card-title class="primary title white--text">
+        <v-card-title class="primary text-h6 white--text">
           Excluir inscrição? Esta ação não poderá ser desfeita.
         </v-card-title>
 
@@ -239,13 +240,26 @@ export default {
   },
 
   methods: {
-    alterarStatusInscricao(callback) {
-      const { id, status } = this.inscricaoVisualizando;
+    isAdmin,
+
+    atualizarInscricao(callback) {
+      const {
+        id,
+        processo_judicial,
+        status,
+        transporte_proprio,
+        vulnerabilidade_social
+      } = this.inscricaoVisualizando;
 
       this.showList = false;
 
       this.$http
-        .put(`/inscricao/${id}`, { status })
+        .put(`/inscricao/${id}`, {
+          processo_judicial,
+          status,
+          transporte_proprio,
+          vulnerabilidade_social
+        })
         .then(inscricoes => {
           this.inscricoes = inscricoes;
           this.showMessage("Inscrição atualizada com sucesso", "success");
@@ -257,6 +271,7 @@ export default {
           this.showList = true;
         });
     },
+
     excluirInscricao({ id }) {
       this.showList = false;
       this.$http
@@ -277,6 +292,7 @@ export default {
           this.showList = true;
         });
     },
+
     getInscricoes() {
       this.$http
         .get("inscricao")
@@ -285,6 +301,7 @@ export default {
         })
         .catch(error => this.showMessage(error, "error"));
     },
+
     getStatusConfig(status) {
       switch (status) {
         case "DEFERIDO":
@@ -302,7 +319,7 @@ export default {
           };
       }
     },
-    isAdmin,
+
     onClickInscricao(inscricao) {
       this.inscricaoOriginal = {
         ...inscricao
@@ -315,6 +332,7 @@ export default {
 
       this.dialog = true;
     },
+
     ordenarInscricoes() {
       this.atualizandoInscricoes = true;
       this.showList = false;
@@ -332,6 +350,7 @@ export default {
           this.showList = true;
         });
     },
+
     alterarPosicao(callback) {
       const { id, posicao } = this.inscricaoVisualizando;
 
@@ -352,6 +371,7 @@ export default {
           callback();
         });
     },
+
     showDialogExclusao(inscricao) {
       this.inscricaoExcluir = inscricao;
       this.dialogExclusao = true;

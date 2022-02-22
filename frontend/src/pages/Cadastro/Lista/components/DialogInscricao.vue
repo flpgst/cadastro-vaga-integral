@@ -2,10 +2,10 @@
   <v-dialog @click:outside="$emit('close')" :value="true" width="750">
     <v-toolbar color="primary" dark flat class="cvi-dialog-toolbar">
       <v-toolbar-title class="d-flex flex-column justify-center">
-        <span class="title" v-text="inscricao.matricula.pessoa.nome" />
+        <span class="text-h6" v-text="inscricao.matricula.pessoa.nome" />
 
         <span
-          class="caption"
+          class="text-caption"
           v-text="
             `Matrícula: ${inscricao.matricula.codigo}  ${
               etapaAtual ? ' - ' + etapaAtual : ''
@@ -31,13 +31,13 @@
         <v-row>
           <v-col
             cols="12"
-            class="title pt-5 pb-0"
+            class="text-h6 pt-5 pb-0"
             v-text="`Protocolo: ${inscricao.protocolo}`"
           />
 
           <v-col
             cols="12"
-            class="caption pt-0 mb-2"
+            class="text-caption pt-0 mb-2"
             v-text="
               `Data da Inscrição: ${format(
                 parseISO(inscricao.data_cadastro),
@@ -122,26 +122,60 @@
             <CPTFormSubtitle />
           </v-col>
 
-          <v-col cols="6">
-            Criança em vulnerabilidade social:
-            {{ inscricao.vulnerabilidade_social ? "Sim" : "Não" }}
+          <v-col cols="6" class="pa-0 d-flex">
+            <v-col cols="auto" class="d-flex pb-0 pr-0">
+              <CPTInput
+                v-model="inscricao.processo_judicial"
+                label="Processo Judicial"
+                :clearable="false"
+              />
+            </v-col>
+
+            <v-col cols="auto" class="px-0 pt-5">
+              <v-tooltip top>
+                <template v-slot:activator="{ on }">
+                  <v-btn v-on="on" icon>
+                    <v-icon
+                      v-text="
+                        processoJudicial ? 'mdi-delete' : 'mdi-content-save'
+                      "
+                      :color="processoJudicial ? 'red' : 'primary'"
+                      @click="onClickProcessoJudicial"
+                    />
+                  </v-btn>
+                </template>
+                <span v-if="processoJudicial">Remover Processo</span>
+                <span v-else>Cadastrar Processo</span>
+              </v-tooltip>
+            </v-col>
           </v-col>
 
-          <v-col v-if="inscricao.processo_judicial" cols="6">
-            Número do processo judicial:
-            {{ inscricao.processo_judicial }}
+          <v-col cols="6" class="pb-0">
+            <CPTSelect
+              v-model="inscricao.transporte_proprio"
+              :items="MEIOS_TRANSPORTE"
+              item-text="text"
+              item-value="value"
+              label="Meio de transporte próprio:"
+              required
+              @input="onSaveInscricao('transporte_proprio')"
+            />
           </v-col>
 
-          <v-col cols="6">
-            Meio de transporte próprio:
-            <span>
-              {{ inscricao.transporte_proprio.replace("_", " ") }}
-            </span>
+          <v-col cols="6" class="pb-0">
+            <CPTCheckbox
+              v-model="inscricao.vulnerabilidade_social"
+              class="ma-0"
+              label="Criança em vulnerabilidade social"
+              @input="onSaveInscricao('vulnerabilidade_social')"
+            />
           </v-col>
 
-          <v-col cols="6">
-            Renda per capta: R$ {{ inscricao.renda_percapta }}
-          </v-col>
+          <v-col
+            class="text-subtitle-1"
+            cols="6"
+            v-text="`Renda per capta: R$ ${inscricao.renda_percapta}`"
+          />
 
           <v-col cols="12">
             <CPTFormSubtitle label="Endereço" />
@@ -348,11 +382,12 @@
 </template>
 
 <script>
-import CPTInput from "@/components/Input";
-import CPTBtn from "@/components/Btn";
 import CPTAutocomplete from "@/components/Autocomplete";
-import CPTSelect from "@/components/Select";
+import CPTBtn from "@/components/Btn";
+import CPTCheckbox from "@/components/Checkbox";
 import CPTFormSubtitle from "@/components/FormSubtitle";
+import CPTInput from "@/components/Input";
+import CPTSelect from "@/components/Select";
 
 import stringToCpf from "@/utils/stringToCpf";
 import { format, parseISO } from "date-fns";
@@ -366,14 +401,21 @@ const status = [DEFERIDO, INDEFERIDO, PENDENTE, DESISTENTE];
 
 const JUSTIFICATIVA = "DEFERIDO NO CADASTRO DE VAGA INTEGRAL";
 
+const MEIOS_TRANSPORTE = [
+  { text: "Não possui", value: "NAO_POSSUI" },
+  { text: "Carro", value: "CARRO" },
+  { text: "Moto", value: "MOTO" }
+];
+
 export default {
   name: "dialog-inscricao",
   components: {
-    CPTInput,
-    CPTBtn,
     CPTAutocomplete,
-    CPTSelect,
-    CPTFormSubtitle
+    CPTBtn,
+    CPTCheckbox,
+    CPTFormSubtitle,
+    CPTInput,
+    CPTSelect
   },
   props: {
     value: {
@@ -389,11 +431,14 @@ export default {
     if (this.inscricao.status === DEFERIDO) this.getUnidadesEnsino();
 
     this.getEnturmacao();
+
+    this.processoJudicial = this.inscricao.processo_judicial ? true : false;
   },
   data: () => ({
     DEFERIDO,
     INDEFERIDO,
     PENDENTE,
+    MEIOS_TRANSPORTE,
     alunoEnturmado: false,
     endereco: null,
     enturmacoes: [],
@@ -401,6 +446,7 @@ export default {
     inscricaoOriginal: null,
     loading: false,
     loadingBtn: false,
+    processoJudicial: false,
     status,
     turma: null,
     turmas: [],
@@ -418,6 +464,22 @@ export default {
     }
   },
   methods: {
+    onClickProcessoJudicial() {
+      if (!this.processoJudicial && !this.inscricao.processo_judicial)
+        return this.showMessage(
+          "Informe o número do processo antes de salvar",
+          "error"
+        );
+      if (this.processoJudicial) {
+        this.inscricao.processo_judicial = null;
+        this.processoJudicial = false;
+      } else {
+        this.processoJudicial = true;
+      }
+
+      this.onSaveInscricao("processo_judicial");
+    },
+
     enturmar() {
       this.loadingBtn = true;
       this.$erudio
