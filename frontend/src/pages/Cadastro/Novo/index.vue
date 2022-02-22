@@ -288,7 +288,7 @@
     <v-dialog v-model="dialog" width="750">
       <v-card color="grey lighten-5">
         <v-card-title
-          class="headline primary white--text"
+          class="text-h5 primary white--text"
           v-text="'Renda percapta zerada'"
         />
 
