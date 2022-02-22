@@ -21,15 +21,8 @@ class InscricaoController {
 
       // if (!req.superAdmin) throw new ErrorHandler(401, 'Não autorizado');
 
-      const {
-        logradouro,
-        numero,
-        complemento,
-        bairro,
-        cep,
-        cidade_id,
-        id,
-      } = matricula.dataValues.pessoa.dataValues.endereco.dataValues;
+      const { logradouro, numero, complemento, bairro, cep, cidade_id, id } =
+        matricula.dataValues.pessoa.dataValues.endereco.dataValues;
 
       const endereco = [
         logradouro,
@@ -164,7 +157,12 @@ class InscricaoController {
 
   async update(req, res, next) {
     try {
-      const { status } = req.body;
+      const {
+        status,
+        vulnerabilidade_social,
+        processo_judicial,
+        transporte_proprio,
+      } = req.body;
       const { id } = req.params;
 
       if (!req.superAdmin && !req.gestor)
@@ -177,7 +175,11 @@ class InscricaoController {
         if (!inscricao) {
           return res.status(404).json({ message: 'Inscricão não encontrada' });
         }
+
         inscricao.status = status;
+        inscricao.vulnerabilidade_social = vulnerabilidade_social;
+        inscricao.processo_judicial = processo_judicial;
+        inscricao.transporte_proprio = transporte_proprio;
 
         await inscricao.save();
 
