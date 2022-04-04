@@ -174,7 +174,7 @@
           <v-col
             class="text-subtitle-1"
             cols="6"
-            v-text="`Renda per capta: R$ ${inscricao.renda_percapta}`"
+            v-text="`Renda per capita: R$ ${inscricao.renda_percapta}`"
           />
 
           <v-col cols="12">
